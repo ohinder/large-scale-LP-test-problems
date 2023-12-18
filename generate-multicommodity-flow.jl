@@ -8,13 +8,20 @@ using Plots
 using ArgParse
 
 function build_multicommodity_flow_problem(
-    num_factories_per_commodity,
-    num_commodities,
-    num_warehouses,
-    num_stores,
+    num_factories_per_commodity::Int64,
+    num_commodities::Int64,
+    num_warehouses::Int64,
+    num_stores::Int64,
+    additional_overtime_cost::Float64,
     folder_for_plots::String,
     optimize_model::Bool
 )
+    @assert num_factories_per_commodity >= 1
+    @assert num_commodities >= 1
+    @assert num_warehouses >= 1
+    @assert num_stores >= 1
+    @assert additional_overtime_cost >= 0.0
+    
     average_demand_per_commodity = 100.0 * exp.(randn(num_commodities));
     distribution_per_commodity = Poisson.(average_demand_per_commodity);
     demand_per_commodity_store = zeros(num_commodities, num_stores);
@@ -24,7 +31,7 @@ function build_multicommodity_flow_problem(
 
     total_demand_per_commodity = demand_per_commodity_store * ones(num_stores);
 
-    supply_per_factory = 1.2 * num_stores * average_demand_per_commodity / num_factories_per_commodity;
+    supply_per_factory = num_stores * total_demand_per_commodity / num_factories_per_commodity;
     total_demand = sum(demand_per_commodity_store);
 
     warehouse_normal_capacity =  0.95 * total_demand / num_warehouses;
@@ -194,23 +201,28 @@ function parse_commandline()
     @add_arg_table s begin
         "--seed"
             help = "The random seed used to generate the instance."
+            arg_type = Int64
             default = 1
         "--num_factories_per_commodity"
             help = "The number of factories per commodity in the generated instance"
-            arg_type = Int
+            arg_type = Int64
             default = 5
         "--num_commodities"
             help = "Number of commodities"
-            arg_type = Int
+            arg_type = Int64
             default = 10
         "--num_warehouses"
             help = "Number of warehouses"
-            arg_type = Int
+            arg_type = Int64
             default = 10
         "--num_stores"
             help = "Number of stores"
-            arg_type = Int
+            arg_type = Int64
             default = 100
+        "--additional_overtime_cost"
+            help = "Number of stores"
+            arg_type = Float64
+            default = 0.3
         "--optimize_model"
             help = "If this flag is set then the model will be optimized with HiGHS. 
             Only use this option is the model is small enough for HiGHS to optimize."
@@ -239,12 +251,16 @@ function main()
     println("building model ...")
 
     Random.seed!(parsed_args["seed"])
-    
+
+    if isdir(parsed_args["folder_for_plots"])
+        throw(error("Folder $(parsed_args["folder_for_plots"]) already exists. Please choose a folder location that does not already exist."))
+    end
     model = build_multicommodity_flow_problem(
         parsed_args["num_factories_per_commodity"],
         parsed_args["num_commodities"],
         parsed_args["num_warehouses"],
         parsed_args["num_stores"],
+        parsed_args["additional_overtime_cost"],
         parsed_args["folder_for_plots"],
         parsed_args["optimize_model"]
     )
