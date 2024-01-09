@@ -174,7 +174,7 @@ given by $q_{i,j,k} \ge 0$.
 ### Optimization model
 
 As there is relatively few heat sources we minimize the sum of 
-$q_{ijk}$, this naturally makes the model sparse:
+$q_{i,j,k}$, this naturally makes the model sparse:
 $$
 \min \sum_{i,j,k} q_{i,j,k}
 $$
@@ -203,10 +203,8 @@ from the $k$ potential locations for the heat sources we choose uniformly at ran
 total inputted heat uniformly between zero and one.
 We then generate our grid and round the positional vectors to the nearest point in the grid. 
 This yields a set $M$ of indicies for the measurement locations.
+Finally, we solve the discretized Possion's equation to calculate the true temperature distribution $u^\star$.
 
-Next, we solve the discretized Possion's equation using conjugate gradient to calculate the true temperature distribution $u^\star$.
 
-### Usage
 
-TODO(ohinder)
 

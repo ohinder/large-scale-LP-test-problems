@@ -54,20 +54,20 @@ function build_heat_source_detection_problem(
 
     q = zeros(grid_size, grid_size, grid_size)
     for location=axes(heat_source_location_indexes, 2)
-        q[heat_source_location_indexes[:,location]...] = grid_size^3 * heat_flow_rate[location]
+        q[heat_source_location_indexes[:,location]...] += grid_size^3 * heat_flow_rate[location]
     end
 
     ##################
     # Compute u_true #
     ##################
     
+    # TODO(ohinder): replace SCS with pure conjugate gradient???
     pde_model = Model(optimizer_with_attributes(SCS.Optimizer,
        "max_iters" => 100000,
        "eps" => 10^-11,
        "linear_solver" => SCS.IndirectSolver
     ))
     
-    #pde_model = Model(HiGHS.Optimizer)
     @variable(pde_model, u[i=0:(grid_size+1),j=0:(grid_size+1),k=0:(grid_size+1)]);
     build_discretized_possion!(pde_model, u, q, grid_size)
     optimize!(pde_model)
