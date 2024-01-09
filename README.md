@@ -2,6 +2,35 @@ Repository for generating large-scale LP test instances for PDLP MPC paper.
 
 More examples and documentation will be added in the near future.
 
+# Creating the test instances
+
+First, create a directory for storing the problem instances
+```shell
+$ mkdir problem-instances
+```
+
+To generate the synthetic model of the supply chain for a large retailer run:
+
+```shell
+$ julia-1.7 generate-multicommodity-flow.jl \
+    --output_file problem-instances/multicommodity-flow-small-test-instance.mps.gz \
+    --num_commodities 100 \
+    --num_warehouses 30 \
+    --num_stores 100
+```
+
+To generate heat source location problem:
+
+```shell
+$ julia-1.7 generate-heat-source-location.jl \
+    --output_file problem-instances/heat-source-instance.mps.gz \
+    --ground_truth_file problem-instances/temperature_ground_truth.txt \
+    --grid_size 10 \
+    --num_source_locations 3 \
+    --num_possible_source_locations 100 \
+    --num_measurement_locations 30
+```
+
 # Background on problems
 
 ## Synthetic model of the supply chain for a large retailer
@@ -39,7 +68,7 @@ and larger models incorporating, for example,
 the multiperiod aspect of the problem or the issue of deciding where 
 to build new warehouses.
 
-### Decision variables:
+### Decision variables
 
 Let $u_{k,f,w} \ge 0$ be the flow from factory $(k,f)$ to warehouse $w$ for commodity $k$.
 Let $v_{k,w,s} \ge 0$ be the flow from warehouse $w$ to store $s$ for commodity $k$.
@@ -80,40 +109,27 @@ By default this is set to be $0.3$.
 
 Minimize shipping costs plus overtime costs:
 $$
-\min \sum_{k=1}^K \sum_{f=1}^F \sum_{w=1}^W \| g_{k,f} - h_{w} \|_2 u_{k,f,w} + \sum_{s=1}^S \sum_{w=1}^W \| h_{w} - q_s \|_2 u_{k,f,w} + \theta \sum_{w=1}^W x_{w}
+\min \sum_{k=1}^K \sum_{f=1}^F \sum_{w=1}^W \| g_{k,f} - h_{w} \|_2 u_{k,f,w} + \sum_{s=1}^S \sum_{w=1}^W \| h_{w} - q_s \|_2 u_{k,f,w} + \theta \sum_{w=1}^W x_{w}.
 $$
-
 Flow from each factory $(f,k)$ does not exceed supply:
 $$
-\sum_{w=1}^W u_{k,f,w} \le m_{k, f}
+\sum_{w=1}^W u_{k,f,w} \le m_{k, f}.
 $$
-
 For each warehouse $w$, if the normal operating capacity $\gamma$ is exceeded then we
 must use overtime:
 $$
-\sum_{k=1}^K \sum_{f=1}^F u_{k,f,w} \le \gamma + x_{w}
+\sum_{k=1}^K \sum_{f=1}^F u_{k,f,w} \le \gamma + x_{w}.
 $$
-
 For each commodity $k$, flow into warehouses $w$ equals flow out of warehouse $w$:
 $$
-\sum_{f=1}^F u_{k,f,w} = \sum_{s=1}^S v_{k,w,s} 
+\sum_{f=1}^F u_{k,f,w} = \sum_{s=1}^S v_{k,w,s}.
 $$
-
 Demand for each commodity $k$ at store $s$ is met:
 $$
-\sum_{w=1}^W v_{k,w,s} \ge d_{k,s}
+\sum_{w=1}^W v_{k,w,s} \ge d_{k,s}.
 $$
 
-### Usage
-
-```shell
-$ mkdir problem-instances
-$ julia-1.7 generate-multicommodity-flow.jl \
-    --output_file problem-instances/multicommodity-flow-small-test-instance.mps.gz \
-    --num_commodities 100 \
-    --num_warehouses 30 \
-    --num_stores 100
-```
+### Generating plots of the optimal solution
 
 For small instances you can also solve the problem using HiGHS and generate
 plots of the optimal solution for a random selection of the commodities:
@@ -126,3 +142,71 @@ $ julia-1.7 generate-multicommodity-flow.jl \
 ```
 
 This was used during the development process to verify the model was producing reasonable optimal solutions.
+
+## Locating heat sources from a small number measurements
+
+### Motivation
+
+Consider a homogenous cube $[0,1]^3$ of material with constant temperature on its boundary.
+Within the material several heat sources have been randomly located.
+Using a small number of temperature measurements in the material 
+from predefined locations we wish to recover the location
+of these heat sources. To make the problem the problem more tractable
+there is only a small number of possible locations for these heat sources.
+We assume the material is at equilibrium.
+If locations of the heat sources are known (and the size of their input)
+then we can solve Possion's equation to calculate the temperature profile
+through the material:
+$$
+\frac{d^2 u}{d x^2} + \frac{d^2 u}{d y^2} + \frac{d^2 u}{d z^2} = -q(x, y, z)
+$$
+where $q$ represents the heat source inputs and $u$ is the temperature profile.
+This is an inverse problem: we want to recover the heat sources from the 
+observations. To solve this problem we will discretize the PDE into
+$N \times N \times N$ grid points.
+
+### Decision variables
+
+The temperature of the material at location $(i / N,j / N, k / N)$ is given by
+$u_{i,j,k}$. The heat injected at location $(i / N,j / N, k / N)$ is
+given by $q_{i,j,k} \ge 0$.
+
+### Optimization model
+
+As there is relatively few heat sources we minimize the sum of 
+$q_{ijk}$, this naturally makes the model sparse:
+$$
+\min \sum_{i,j,k} q_{i,j,k}
+$$
+We then build a finite element approximation of Possion's equation:
+$$
+\frac{u_{i+1,j,k} - 2 u_{i,j,k} + u_{i-1,j,k}}{h^2} + \frac{u_{i,j+1,k} - 2 u_{i,j,k} + u_{i,j-1,k}}{h^2} + \frac{u_{i,j,k+1} - 2 u_{i,j,k} + u_{i,j,k-1}}{h^2} = -q_{i,j,k}
+$$
+and setup the boundary conditions
+$$
+u_{1,j,k} = 0 \quad u_{i,1,k} = 0 \quad u_{i,j,1} = 0
+$$
+$$
+u_{N,j,k} = 0 \quad u_{i,N,k} = 0 \quad u_{i,j,N} = 0.
+$$
+Then at the measurement locations $M$ we have
+$$
+u_{i,j,k}^\star = u_{i,j,k}  \quad \forall (i,j,k) \in M
+$$
+
+### Instance generation
+
+We generate $v_1, \dots, v_m$ measurement locations uniformly at random
+from $[0,1]^3$ and potential locations for the heat sources $w_1, \dots, w_k$ uniformly at random
+from $[0,1]^3$. Then
+from the $k$ potential locations for the heat sources we choose uniformly at random $l$ location different to place the heat sources, denoted by the set $\mathcal{L}$ where $l < k$. At each location with a heat source we generate the 
+total inputted heat uniformly between zero and one.
+We then generate our grid and round the positional vectors to the nearest point in the grid. 
+This yields a set $M$ of indicies for the measurement locations.
+
+Next, we solve the discretized Possion's equation using conjugate gradient to calculate the true temperature distribution $u^\star$.
+
+### Usage
+
+TODO(ohinder)
+
