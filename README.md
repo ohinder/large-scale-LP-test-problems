@@ -1,7 +1,5 @@
 Repository for generating large-scale LP test instances for PDLP MPC paper.
 
-More examples and documentation will be added in the near future.
-
 # Creating the test instances
 
 To create small versions of the problem instances (for testing) run:
@@ -10,12 +8,13 @@ To create small versions of the problem instances (for testing) run:
 $ ./create_small_instances.sh
 ```
 
-To create large versions of the problem instances (for testing) run. This is going to take a while and you will need a machine 
-with >= 32GB of RAM.
+To create large versions of the problem instances (for testing) run.
 
 ```shell
 $ ./create_large_instances.sh
 ```
+This is going to take a while and you will need a machine 
+with $\ge 32$GB of RAM.
 
 # Background on problems
 
