@@ -4,31 +4,17 @@ More examples and documentation will be added in the near future.
 
 # Creating the test instances
 
-First, create a directory for storing the problem instances
+To create small versions of the problem instances (for testing) run:
+
 ```shell
-$ mkdir problem-instances
+$ ./create_small_instances.sh
 ```
 
-To generate the synthetic model of the supply chain for a large retailer run:
+To create large versions of the problem instances (for testing) run. This is going to take a while and you will need a machine 
+with >= 32GB of RAM.
 
 ```shell
-$ julia-1.7 generate-multicommodity-flow.jl \
-    --output_file problem-instances/multicommodity-flow-small-test-instance.mps.gz \
-    --num_commodities 100 \
-    --num_warehouses 30 \
-    --num_stores 100
-```
-
-To generate heat source location problem:
-
-```shell
-$ julia-1.7 generate-heat-source-location.jl \
-    --output_file problem-instances/heat-source-instance.mps.gz \
-    --ground_truth_file problem-instances/temperature_ground_truth.txt \
-    --grid_size 10 \
-    --num_source_locations 3 \
-    --num_possible_source_locations 100 \
-    --num_measurement_locations 30
+$ ./create_large_instances.sh
 ```
 
 # Background on problems
@@ -205,6 +191,103 @@ We then generate our grid and round the positional vectors to the nearest point 
 This yields a set $M$ of indicies for the measurement locations.
 Finally, we solve the discretized Possion's equation to calculate the true temperature distribution $u^\star$.
 
+## Statistical matching with covariate balancing constraints for making causal inference on observational data
 
+### Motivation
 
+In observational studies we are often wish to perform causal inference where we try to understand the 
+impact of particular treatment on patient outcomes. However, one difficulty is that the patients
+that recieve the treatment can be a very different group of patients from those that did not recieve
+the treatement. For example, perhaps there is a confounding variable -- how sick the patient is
+which affects whether they recieve the treatement and their outcome.  
+Matching is a popular approach in statistics where treated patients are matched to control patients
+with similar covariate values. This produces a new smaller sample where the patients in both the
+treatment and control are similar -- resembling a randomized experiment. 
+However, one problem with this approach is that the covariates in the treatment group may not match covariates in the subsampled control group [C].
+For this reason, it has been proposed that ones finds the optimal matching subject
+to additional constraints that the in the covariates in the subsampled control group match the treatment [A,B]. 
+This can be modelled as integer program [A] but in practice the linear programming
+relaxation can be used to quickly generate matchings for large
+datasets [B].
+We generate synthetic versions of this problem for testing.
 
+### Parameters
+
+There are $i = 1, \dots, n$ samples in the treatment group and $j = 1, \dots, m$ samples in the control group. We assume that $m > n$. Moroever, there are $k=1,\dots,d$ covariate values for each sample.
+
+$A_{ik}$ for $i=1,\dots,n$ and $k=1,\dots,d$ is the $k\text{th}$ covariate value for sample $i$ of the treatment group.
+
+$B_{ik}$ for $i=1,\dots,n$ and $k=1,\dots,d$ is the $k\text{th}$ covariate value for sample $j$ of the control group.
+
+$q$ is the total number of samples to be included in the subsample.
+
+Furthermore, define the first moment of the original sample as
+$$
+\bar{A}_k = \frac{1}{n+m} \left(\sum_{i=1}^n A_{ik} + \sum_{j=1}^m B_{jk} \right)
+$$
+Also, define the second moment of the orignal sample as
+$$
+M_{kl} = \frac{1}{n+m} \left( \sum_{i=1}^n A_{ik} A_{il} + \sum_{j=1}^m B_{ik} B_{il} \right)
+$$
+Let $E$ be the set of edges, i.e., the pairs of treatment and control
+samples that we allow to be matched.
+
+### Decision variables
+
+$x_{ij}$ is one if sample $i$ from the treatment group is matched to sample $j$ from the control group and zero otherwise.
+
+$w_{j}$ for $j = 1, \dots, n$ is one if sample $j$ from the control group is matched and zero otherwise.
+
+To turn it into a linear program, we relax the integrality requirements and only require that $x_{ij}$ and $w_j$ are in $[0,1]$.
+This is a popular approach for solving large-scale versions of these problems [B].
+
+### Optimization model
+
+Minimize the total weight of the assignment:
+$$
+\sum_{(i,j) \in E} \| A_{i\cdot} - B_{i\cdot} \| x_{ij}
+$$
+Matching constraints for treatment group:
+$$
+\sum_{j=1}^{m} x_{ij} = 1 \quad i = 1, \dots, n
+$$
+Matching constraints for control group:
+$$
+\sum_{i=1}^{n} x_{ij} = w_{j} \quad i = 1, \dots, m
+$$
+Covariate first moments of subsampled control approximately match the treatment:
+$$
+-\epsilon \le  \frac{1}{n} \sum_{j=1}^m B_{jk} w_j - \bar{A}_k \le \epsilon \quad k = 1, \dots, d
+$$
+Covariate second moments approximately match original sample:
+$$
+-\epsilon \le  \frac{1}{n} \sum_{j=1}^m B_{jk} B_{jl} w_j - M_{kl} \le \epsilon \quad k = 1, \dots, d \quad l = 1, \dots, d
+$$
+
+### Instance generation
+
+We generate $A_{ik}$ from a standard normal distribution.
+We then create a shift vector:
+$$
+v_{k} \sim N(0,0.1) \quad k = 1, \dots, d
+$$
+and then set
+$$
+B_{ik} \sim N(v_k, 1).
+$$
+This shift vector ensures that the covariate values of $A$ and $B$ have different distributions.
+Finally, to choose the edges we use a k-d tree to find 
+the $t$ closest control samples to each treatment sample (where $t$ is say $10$).
+This reduces the number of edges we include in the problem, 
+allowing us to focus on the most promising matches.
+This make the problem size dramatically smaller but, 
+in our experience,
+has minimal impact on the optimal objective.
+
+### References
+
+[A] Zubizarreta, José R. "Using mixed integer programming for matching in an observational study of kidney failure after surgery." Journal of the American Statistical Association 107.500 (2012): 1360-1371.
+
+[B] https://cran.r-project.org/web/packages/designmatch/index.html
+
+[C] Ali, M.S., Groenwold, R.H., Belitser, S.V., Pestman, W.R., Hoes, A.W., Roes, K.C., de Boer, A. and Klungel, O.H., 2015. Reporting of covariate selection and balance assessment in propensity score analysis is suboptimal: a systematic review. Journal of clinical epidemiology, 68(2), pp.122-131.
