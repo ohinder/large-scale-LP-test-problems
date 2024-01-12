@@ -41,7 +41,8 @@ function build_heat_source_detection_problem(
         num_source_locations::Int64,
         num_possible_source_locations::Int64,
         num_measurement_locations::Int64,
-        grid_size::Int64
+        grid_size::Int64,
+        maximum_relative_measurement_error::Float64
     )
     @assert num_source_locations < num_possible_source_locations
     @assert grid_size > 2
@@ -64,9 +65,11 @@ function build_heat_source_detection_problem(
     # TODO(ohinder): replace SCS with pure conjugate gradient???
     pde_model = Model(optimizer_with_attributes(SCS.Optimizer,
        "max_iters" => 100000,
-       "eps" => 10^-11,
+       "eps" => 10^-10,
        "linear_solver" => SCS.IndirectSolver
     ))
+
+    println("computing u_true")
     
     @variable(pde_model, u[i=0:(grid_size+1),j=0:(grid_size+1),k=0:(grid_size+1)]);
     build_discretized_possion!(pde_model, u, q, grid_size)
@@ -86,7 +89,8 @@ function build_heat_source_detection_problem(
     ############################
     # Build optimization model #
     ############################
-    model = Model(HiGHS.Optimizer)
+    println("building model ...")
+
     model = Model(optimizer_with_attributes(SCS.Optimizer,
        "max_iters" => 100000,
        "eps" => 10^-6,
@@ -112,8 +116,15 @@ function build_heat_source_detection_problem(
 
     # u is known at the measurement locations 
     for location=axes(measurement_location_indexes,2)
-        location_indicies = measurement_location_indexes[:,location] .+ 1
-        JuMP.fix(u[location_indicies...], u_true[location_indicies...]; force=true)
+        location_indicies = measurement_location_indexes[:,location]
+        # Allow a small amount of errors in measurments
+        # to ensure that errors in the calculation of u_true do not
+        # make the model infeasible.
+        maximum_u_value = u_true[location_indicies...] * (1 + maximum_relative_measurement_error)
+        minimum_u_value = u_true[location_indicies...] / (1 + maximum_relative_measurement_error)
+
+        JuMP.set_lower_bound(u[location_indicies...], minimum_u_value)
+        JuMP.set_upper_bound(u[location_indicies...], maximum_u_value)
     end
     println("built inverse problem")
 
@@ -137,6 +148,9 @@ function parse_commandline()
         "--num_measurement_locations"
             arg_type = Int64
             default = 20
+        "--maximum_relative_measurement_error"
+            arg_type = Float64
+            default = 1e-6
         "--grid_size"
             help = "Number of grid planes per coordinate. The total number of grid points 
             will be the square of this number."
@@ -161,7 +175,6 @@ function main()
     for (arg,val) in parsed_args
         println("  $arg  =>  $val")
     end
-    println("building model ...")
 
     Random.seed!(parsed_args["seed"])
 
@@ -169,7 +182,8 @@ function main()
         parsed_args["num_source_locations"],
         parsed_args["num_possible_source_locations"],
         parsed_args["num_measurement_locations"],
-        parsed_args["grid_size"]
+        parsed_args["grid_size"],
+        parsed_args["maximum_relative_measurement_error"]
     )
 
     HDF5.h5write(parsed_args["ground_truth_file"], "u_true", u_true)
