@@ -1,4 +1,4 @@
-Repository for generating large-scale LP test instances for PDLP MPC paper.
+Repository for generating large-scale linear programming (LP) test instances for the PDLP MPC paper.
 
 # Creating the test instances
 
@@ -52,6 +52,12 @@ some realisism. In practice, one can imagine more complicated
 and larger models incorporating, for example,
 the multiperiod aspect of the problem or the issue of deciding where 
 to build new warehouses.
+
+For the `create_large_instances.sh` we use 40000 commodities, 100 warehouses and 2000 stores.
+For context, 
+Walmart has over 4000 stores in the United States, and the company has over 200 distribution centers [E]. 
+Moreover, the average Walmart
+store sells around 120,000 different products [D].
 
 ### Decision variables
 
@@ -290,3 +296,7 @@ has minimal impact on the optimal objective.
 [B] https://cran.r-project.org/web/packages/designmatch/index.html
 
 [C] Ali, M.S., Groenwold, R.H., Belitser, S.V., Pestman, W.R., Hoes, A.W., Roes, K.C., de Boer, A. and Klungel, O.H., 2015. Reporting of covariate selection and balance assessment in propensity score analysis is suboptimal: a systematic review. Journal of clinical epidemiology, 68(2), pp.122-131.
+
+[D] https://www.zippia.com/advice/walmart-statistics/#:~:text=every%20single%20day.-,In%20fact%2C%20just%20one%20Walmart%20Supercenter%20in%20the%20U.S.%20serves,items%20available%20on%20the%20shelves.
+
+[E] https://corporate.walmart.com/news/2022/06/03/a-new-era-of-fulfillment-introducing-walmarts-next-generation-fulfillment-centers
