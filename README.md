@@ -84,13 +84,13 @@ This two step process generates more realistic data as some products have very h
 
 Let $m_{k,f}$ be the maximum production of commodity $k$ at factory
 $f$. This is generated in the code using 
-the formula $m_{k,f} = \frac{1}{F} \sum_{k=1}^K \sum_{s=1}^S d_{k,s}`$ such 
+the formula $`m_{k,f} = \frac{1}{F} \sum_{k=1}^K \sum_{s=1}^S d_{k,s}`$ such 
 that the factories produce the same quantity of each
 code and total demand equals total supply.
 
 Let $\gamma$ be the normal processing capacity of a
 warehouse. This is generated in the code using 
-the formula $\gamma = \frac{0.95}{W} \times \sum_{k=1}^K \sum_{s=1}^S d_{k,s}`$
+the formula $`\gamma = \frac{0.95}{W} \times \sum_{k=1}^K \sum_{s=1}^S d_{k,s}`$
 so that without using any overtime the warehouses could meet $95\%$
 of total demand.
 Let $\theta$ be the cost of additional overtime.
