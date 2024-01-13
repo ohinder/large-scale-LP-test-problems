@@ -90,7 +90,7 @@ code and total demand equals total supply.
 
 Let $\gamma$ be the normal processing capacity of a
 warehouse. This is generated in the code using 
-the formula $`\gamma = \frac{0.95}{W} \times \sum_{k=1}^K \sum_{s=1}^S d_{k,s}`$
+the formula $`\gamma = \frac{0.95}{W} \times \sum\limits_{k=1}^K \sum\limits_{s=1}^S d_{k,s}`$
 so that without using any overtime the warehouses could meet $95\%$
 of total demand.
 Let $\theta$ be the cost of additional overtime.
@@ -104,22 +104,22 @@ Minimize shipping costs plus overtime costs:
 \min \sum_{k=1}^K \sum_{f=1}^F \sum_{w=1}^W \| g_{k,f} - h_{w} \|_2 u_{k,f,w} + \sum_{s=1}^S \sum_{w=1}^W \| h_{w} - q_s \|_2 u_{k,f,w} + \theta \sum_{w=1}^W x_{w}.
 ```
 Flow from each factory $(f,k)$ does not exceed supply:
-$$
+``` math
 \sum_{w=1}^W u_{k,f,w} \le m_{k, f}.
-$$
+```
 For each warehouse $w$, if the normal operating capacity $\gamma$ is exceeded then we
 must use overtime:
-$$
+``` math
 \sum_{k=1}^K \sum_{f=1}^F u_{k,f,w} \le \gamma + x_{w}.
-$$
+```
 For each commodity $k$, flow into warehouses $w$ equals flow out of warehouse $w$:
-$$
+``` math
 \sum_{f=1}^F u_{k,f,w} = \sum_{s=1}^S v_{k,w,s}.
-$$
+```
 Demand for each commodity $k$ at store $s$ is met:
-$$
+``` math
 \sum_{w=1}^W v_{k,w,s} \ge d_{k,s}.
-$$
+```
 
 ### Generating plots of the optimal solution
 
@@ -149,9 +149,9 @@ We assume the material is at equilibrium.
 If locations of the heat sources are known (and the size of their input)
 then we can solve Possion's equation to calculate the temperature profile
 through the material:
-$$
+``` math
 \frac{d^2 u}{d x^2} + \frac{d^2 u}{d y^2} + \frac{d^2 u}{d z^2} = -q(x, y, z)
-$$
+```
 where $q$ represents the heat source inputs and $u$ is the temperature profile.
 This is an inverse problem: we want to recover the heat sources from the 
 observations. To solve this problem we will discretize the PDE into
@@ -167,24 +167,25 @@ given by $q_{i,j,k} \ge 0$.
 
 As there is relatively few heat sources we minimize the sum of 
 $q_{i,j,k}$, this naturally makes the model sparse:
-$$
+``` math
 \min \sum_{i,j,k} q_{i,j,k}
-$$
+```
 We then build a finite element approximation of Possion's equation:
-$$
+``` math
 \frac{u_{i+1,j,k} - 2 u_{i,j,k} + u_{i-1,j,k}}{h^2} + \frac{u_{i,j+1,k} - 2 u_{i,j,k} + u_{i,j-1,k}}{h^2} + \frac{u_{i,j,k+1} - 2 u_{i,j,k} + u_{i,j,k-1}}{h^2} = -q_{i,j,k}
-$$
+```
 and setup the boundary conditions
-$$
+
+``` math
 u_{1,j,k} = 0 \quad u_{i,1,k} = 0 \quad u_{i,j,1} = 0
-$$
-$$
+```
+``` math
 u_{N,j,k} = 0 \quad u_{i,N,k} = 0 \quad u_{i,j,N} = 0.
-$$
+```
 Then at the measurement locations $M$ we have
-$$
-u_{i,j,k}^\star = u_{i,j,k}  \quad \forall (i,j,k) \in M
-$$
+``` math
+u_{i,j,k}^\star = u_{i,j,k}  \quad \forall (i,j,k) \in M.
+```
 
 ### Instance generation
 
@@ -228,13 +229,13 @@ $B_{ik}$ for $i=1,\dots,n$ and $k=1,\dots,d$ is the $k\text{th}$ covariate value
 $q$ is the total number of samples to be included in the subsample.
 
 Furthermore, define the first moment of the original sample as
-$$
+``` math
 \bar{A}_k = \frac{1}{n+m} \left(\sum_{i=1}^n A_{ik} + \sum_{j=1}^m B_{jk} \right)
-$$
+```
 Also, define the second moment of the orignal sample as
-$$
+``` math
 M_{kl} = \frac{1}{n+m} \left( \sum_{i=1}^n A_{ik} A_{il} + \sum_{j=1}^m B_{ik} B_{il} \right)
-$$
+```
 Let $E$ be the set of edges, i.e., the pairs of treatment and control
 samples that we allow to be matched.
 
@@ -250,37 +251,36 @@ This is a popular approach for solving large-scale versions of these problems [B
 ### Optimization model
 
 Minimize the total weight of the assignment:
-$$
+``` math
 \sum_{(i,j) \in E} \| A_{i\cdot} - B_{i\cdot} \| x_{ij}
-$$
+```
 Matching constraints for treatment group:
-$$
+``` math
 \sum_{j=1}^{m} x_{ij} = 1 \quad i = 1, \dots, n
-$$
+```
 Matching constraints for control group:
-$$
+``` math
 \sum_{i=1}^{n} x_{ij} = w_{j} \quad i = 1, \dots, m
-$$
+```
 Covariate first moments of subsampled control approximately match the treatment:
-$$
+``` math
 -\epsilon \le  \frac{1}{n} \sum_{j=1}^m B_{jk} w_j - \bar{A}_k \le \epsilon \quad k = 1, \dots, d
-$$
+```
 Covariate second moments approximately match original sample:
-$$
+``` math
 -\epsilon \le  \frac{1}{n} \sum_{j=1}^m B_{jk} B_{jl} w_j - M_{kl} \le \epsilon \quad k = 1, \dots, d \quad l = 1, \dots, d
-$$
+```
 
 ### Instance generation
-
 We generate $A_{ik}$ from a standard normal distribution.
 We then create a shift vector:
-$$
+``` math
 v_{k} \sim N(0,0.1) \quad k = 1, \dots, d
-$$
+```
 and then set
-$$
+``` math
 B_{ik} \sim N(v_k, 1).
-$$
+``` 
 This shift vector ensures that the covariate values of $A$ and $B$ have different distributions.
 Finally, to choose the edges we use a k-d tree to find 
 the $t$ closest control samples to each treatment sample (where $t$ is say $10$).
