@@ -84,7 +84,7 @@ This two step process generates more realistic data as some products have very h
 
 Let $m_{k,f}$ be the maximum production of commodity $k$ at factory
 $f$. This is generated in the code using 
-the formula $`m_{k,f} = \frac{1}{F} \sum_{k=1}^K \sum_{s=1}^S d_{k,s}`$ such 
+the formula $`m_{k,f} = \frac{1}{F} \sum\limits_{k=1}^K \sum\limits_{s=1}^S d_{k,s}`$ such 
 that the factories produce the same quantity of each
 code and total demand equals total supply.
 
