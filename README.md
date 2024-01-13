@@ -14,7 +14,7 @@ To create large versions of the problem instances (for testing) run.
 $ ./create_large_instances.sh
 ```
 This is going to take a while and you will need a machine 
-with $\ge 32$GB of RAM.
+with $`\ge 32`$GB of RAM.
 
 # Background on problems
 
