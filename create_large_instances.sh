@@ -33,3 +33,9 @@ julia design-matching-synthetic.jl \
     --num_covariates 15 \
     --num_edges_per_treatment 10 \
     --control_shift_magnitude 0.1
+
+julia generate-production-inventory.jl \
+    --output_file test.mps \
+    --num_factories 100 \
+    --num_stages 200 \
+    --uncertainty_level 0.2
