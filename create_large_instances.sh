@@ -37,5 +37,5 @@ julia design-matching-synthetic.jl \
 julia generate-production-inventory.jl \
     --output_file test.mps \
     --num_factories 100 \
-    --num_stages 200 \
+    --num_stages 300 \
     --uncertainty_level 0.2
