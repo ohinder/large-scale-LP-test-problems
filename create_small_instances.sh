@@ -34,7 +34,7 @@ julia --project design-matching-synthetic.jl \
     --num_covariates 8 \
     --num_edges_per_treatment 10 \
     --control_shift_magnitude 0.1 \
-    seed 1
+    --seed 1
 
 julia --project generate-production-inventory.jl \
     --output_file small-problem-instances/production-inventory.mps.gz \
