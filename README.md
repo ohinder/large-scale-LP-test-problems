@@ -1,5 +1,11 @@
 Repository for generating large-scale linear programming (LP) test instances for the PDLP MPC paper.
 
+# One-time setup
+The code was tested using Julia 1.9.4. To instantiate all the required packages execute 
+``` shell
+julia --project=. -e "import Pkg; Pkg.instantiate()"
+```
+
 # Creating the test instances
 
 To create small versions of the problem instances (for testing) run:
