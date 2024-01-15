@@ -35,7 +35,7 @@ julia --project design-matching-synthetic.jl \
     --control_shift_magnitude 0.1
 
 julia --project generate-production-inventory.jl \
-    --output_file test.mps \
+    --output_file small-problem-instances/production-inventory.mps.gz \
     --num_factories 10 \
     --num_stages 20 \
     --uncertainty_level 0.2
