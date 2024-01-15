@@ -25,11 +25,17 @@ julia --project generate-heat-source-location.jl \
   --num_measurement_locations 40
 
 # Note: we calculate epsilon = 1/sqrt(num_treatment_samples) = 0.0141
-julia --porject design-matching-synthetic.jl \
-  --output_file small-problem-instances/synthetic-design-match.mps.gz \
-  --epsilon 0.0141 \
-  --num_treatment_samples 5000 \
-  --num_control_samples 20000 \
-  --num_covariates 8 \
-  --num_edges_per_treatment 10 \
-  --control_shift_magnitude 0.1
+julia --project design-matching-synthetic.jl \
+    --output_file small-problem-instances/synthetic-design-match.mps.gz \
+    --epsilon 0.0141 \
+    --num_treatment_samples 5000 \
+    --num_control_samples 20000 \
+    --num_covariates 8 \
+    --num_edges_per_treatment 10 \
+    --control_shift_magnitude 0.1
+
+julia --project generate-production-inventory.jl \
+    --output_file test.mps \
+    --num_factories 10 \
+    --num_stages 20 \
+    --uncertainty_level 0.2
