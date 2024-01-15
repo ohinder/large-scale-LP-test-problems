@@ -37,8 +37,8 @@ julia --project design-matching-synthetic.jl \
     seed 1
 
 julia --project generate-production-inventory.jl \
-  --output_file test.mps \
-  --num_factories 10 \
-  --num_stages 20 \
-  --uncertainty_level 0.2 \
-  --seed 1
+    --output_file small-problem-instances/production-inventory.mps.gz \
+    --num_factories 10 \
+    --num_stages 20 \
+    --uncertainty_level 0.2 \
+    --seed 1
