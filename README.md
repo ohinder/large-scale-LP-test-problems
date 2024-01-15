@@ -88,13 +88,7 @@ the formula $m_{k,f} = \frac{1}{F} \sum_{k=1}^K \sum_{s=1}^S d_{k,s}$ such
 that the factories produce the same quantity of each
 code and total demand equals total supply.
 
-Let $\gamma$ be the normal processing capacity of a
-warehouse. This is generated in the code using 
-the formula $\gamma = \frac{0.95}{W} \times \sum_{k=1}^K \sum_{s=1}^S d_{k,s}$
-so that without using any overtime the warehouses could meet $95\%$
-of total demand.
-Let $\theta$ be the cost of additional overtime.
-By default this is set to be $0.3$.
+Let $\gamma$ be the normal processing capacity of a warehouse. This is generated in the code using the formula $\gamma = \frac{0.95}{W} \times \sum_{k=1}^K \sum_{s=1}^S d_{k,s}$ so that without using any overtime the warehouses could meet $95\%$ of total demand. Let $\theta$ be the cost of additional overtime. By default this is set to be $0.3$.
 
 ### Optimization model
 
@@ -106,8 +100,7 @@ Flow from each factory $(f,k)$ does not exceed supply:
 $$
 \sum_{w=1}^W u_{k,f,w} \le m_{k, f}.
 $$
-For each warehouse $w$, if the normal operating capacity $\gamma$ is exceeded then we
-must use overtime:
+For each warehouse $w$, if the normal operating capacity $\gamma$ is exceeded then we must use overtime:
 $$
 \sum_{k=1}^K \sum_{f=1}^F u_{k,f,w} \le \gamma + x_{w}.
 $$
