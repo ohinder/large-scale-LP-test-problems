@@ -57,7 +57,7 @@ and larger models incorporating, for example,
 the multiperiod aspect of the problem or the issue of deciding where 
 to build new warehouses.
 
-For the `create_large_instances.sh` we use 40000 commodities, 100 warehouses and 2000 stores.For context, Walmart has over 4000 stores in the United States, and the company has over 200 distribution centers [E]. Moreover, the average Walmart
+For the `create_large_instances.sh` we use 40000 commodities, 100 warehouses and 2000 stores. For context, Walmart has over 4000 stores in the United States, and the company has over 200 distribution centers [E]. Moreover, the average Walmart
 store sells around 120,000 different products [D].
 
 ### Decision variables
