@@ -5,7 +5,55 @@ using ArgParse
 import HDF5
 using LinearAlgebra
 using JuMP, SCS
+using QPSReader, SparseArrays, IterativeSolvers
 
+function solve_pde_linear_system(pde_model, N, tmp_folder)
+    tmp_mps_filename =  "$tmp_folder/tmp_pde.mps"
+    write_to_file(pde_model, tmp_mps_filename)
+    qpsreader_model = readqps(tmp_mps_filename)
+    rm(tmp_mps_filename)
+
+    rhs = qpsreader_model.lcon
+    original_A = sparse(qpsreader_model.arows, 
+                        qpsreader_model.acols, 
+                        qpsreader_model.avals)
+    u_true_dict = Dict()
+    keep_indicies = Vector{Int64}()
+    for i = 1:length(qpsreader_model.lvar)
+        lvar = qpsreader_model.lvar[i]
+        if lvar == qpsreader_model.uvar[i]
+            rhs -= original_A[:,i] * qpsreader_model.lvar[i]
+            u_true_dict[qpsreader_model.varnames[i]] = lvar
+        elseif lvar == -Inf && qpsreader_model.uvar[i] == Inf
+            push!(keep_indicies, i)
+        else
+            error("Something was wrong with the model")
+        end
+    end
+    rhs = Vector(rhs)
+    new_A = original_A[:,keep_indicies]
+
+    u_tmp = minres(new_A, rhs, abstol=0.0, reltol=1e-10)
+
+    if norm(new_A * u_tmp - rhs) > 1e-8 * norm(rhs)
+        println("warning, didn't solve to desired accuracy:")
+        @show norm(new_A * u_tmp - rhs) / norm(rhs)
+    end
+
+    for i in 1:length(keep_indicies)
+        u_name = qpsreader_model.varnames[keep_indicies[i]]
+        u_true_dict[u_name] = u_tmp[i]
+    end
+
+
+    u_true = zeros(N+2, N+2, N+2);
+    for (key,value) in u_true_dict
+       indicies = parse.(Int, split(key[3:end-1],",")) .+ 1
+       u_true[indicies...] = value 
+    end
+
+    return u_true
+end
 
 function build_discretized_possion!(model, u, q, N::Int64)
     h = 1.0 / N
@@ -42,7 +90,8 @@ function build_heat_source_detection_problem(
     num_possible_source_locations::Int64,
     num_measurement_locations::Int64,
     grid_size::Int64,
-    maximum_relative_measurement_error::Float64
+    maximum_relative_measurement_error::Float64,
+    tmp_folder::String
 )
     @assert num_source_locations < num_possible_source_locations
     @assert grid_size > 2
@@ -62,20 +111,13 @@ function build_heat_source_detection_problem(
     # Compute u_true #
     ##################
 
-    # TODO(ohinder): replace SCS with pure conjugate gradient???
-    pde_model = Model(optimizer_with_attributes(SCS.Optimizer,
-        "max_iters" => 100000,
-        "eps_abs" => 10^-10,
-        "eps_rel" => 10^-10,
-        "linear_solver" => SCS.IndirectSolver
-    ))
+    pde_model = Model()
 
     println("computing u_true")
 
     @variable(pde_model, u[i=0:(grid_size+1), j=0:(grid_size+1), k=0:(grid_size+1)])
     build_discretized_possion!(pde_model, u, q, grid_size)
-    optimize!(pde_model)
-    u_true = Array(value.(u))
+    u_true = solve_pde_linear_system(pde_model, grid_size, tmp_folder)
 
     println("computed u_true")
 
@@ -92,12 +134,7 @@ function build_heat_source_detection_problem(
     ############################
     println("building model ...")
 
-    model = Model(optimizer_with_attributes(SCS.Optimizer,
-        "max_iters" => 100000,
-        "eps_abs" => 10^-6,
-        "eps_rel" => 10^-6,
-        "linear_solver" => SCS.IndirectSolver
-    ))
+    model = Model()
     @variable(model, u[i=0:(grid_size+1), j=0:(grid_size+1), k=0:(grid_size+1)])
     @variable(model, 0.0 <= q[i=1:grid_size, j=1:grid_size, k=1:grid_size] <= 0.0)
 
@@ -166,6 +203,9 @@ function parse_commandline()
         "--output_file"
         help = "This is the location that the mps file will be written to."
         required = true
+        "--tmp_folder"
+        help = "This is the location that the a temporary mps file will be written."
+        required = true
     end
 
     return parse_args(s)
@@ -185,7 +225,8 @@ function main()
         parsed_args["num_possible_source_locations"],
         parsed_args["num_measurement_locations"],
         parsed_args["grid_size"],
-        parsed_args["maximum_relative_measurement_error"]
+        parsed_args["maximum_relative_measurement_error"],
+        parsed_args["tmp_folder"]
     )
 
     HDF5.h5write(parsed_args["ground_truth_file"], "u_true", u_true)
