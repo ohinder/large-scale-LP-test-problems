@@ -4,7 +4,8 @@ julia --project generate-multicommodity-flow.jl \
   --output_file small-problem-instances/multicommodity-flow-small-test-instance.mps.gz \
   --num_commodities 100 \
   --num_warehouses 30 \
-  --num_stores 100
+  --num_stores 100 \
+  --seed 1
 
 julia --project generate-heat-source-location.jl \
   --output_file small-problem-instances/heat-source-instance1.mps.gz \
@@ -32,10 +33,12 @@ julia --project design-matching-synthetic.jl \
     --num_control_samples 20000 \
     --num_covariates 8 \
     --num_edges_per_treatment 10 \
-    --control_shift_magnitude 0.1
+    --control_shift_magnitude 0.1 \
+    seed 1
 
 julia --project generate-production-inventory.jl \
-    --output_file test.mps \
-    --num_factories 10 \
-    --num_stages 20 \
-    --uncertainty_level 0.2
+  --output_file test.mps \
+  --num_factories 10 \
+  --num_stages 20 \
+  --uncertainty_level 0.2 \
+  --seed 1
