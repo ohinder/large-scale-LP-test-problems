@@ -1,12 +1,12 @@
 mkdir large-problem-instances
 
-julia generate-multicommodity-flow.jl \
+julia --project generate-multicommodity-flow.jl \
     --output_file large-problem-instances/multicommodity-flow-small-test-instance.mps.gz \
     --num_commodities 40000 \
     --num_warehouses 100 \
     --num_stores 2000
 
-julia generate-heat-source-location.jl \
+julia --project generate-heat-source-location.jl \
     --output_file large-problem-instances/heat-source-instance1.mps.gz \
     --ground_truth_file large-problem-instances/temperature_ground_truth1.txt \
     --grid_size 500 \
@@ -15,7 +15,7 @@ julia generate-heat-source-location.jl \
      --seed 1 \
     --num_measurement_locations 100
 
-julia generate-heat-source-location.jl \
+julia --project generate-heat-source-location.jl \
     --output_file large-problem-instances/heat-source-instance2.mps.gz \
     --ground_truth_file large-problem-instances/temperature_ground_truth2.txt \
     --grid_size 500 \
@@ -25,7 +25,7 @@ julia generate-heat-source-location.jl \
     --num_measurement_locations 50
 
 # Note: we calculate epsilon = 1/sqrt(num_treatment_samples) = 0.00141
-julia design-matching-synthetic.jl \
+julia --project design-matching-synthetic.jl \
     --output_file large-problem-instances/synthetic-design-match.mps.gz \
     --epsilon 0.00141 \
     --num_treatment_samples 500000 \
@@ -34,7 +34,7 @@ julia design-matching-synthetic.jl \
     --num_edges_per_treatment 10 \
     --control_shift_magnitude 0.1
 
-julia generate-production-inventory.jl \
+julia --project generate-production-inventory.jl \
     --output_file test.mps \
     --num_factories 100 \
     --num_stages 300 \
