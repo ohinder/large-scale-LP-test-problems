@@ -324,12 +324,6 @@ The remaining inventory level in the central warehouse at the end of each time p
 ```
 where $v_1$ is the initial inventory level in the central warehouse at the beginning of the selling horizon, the second term is the cumulative number of product units that have been produced at the factories up through time period $t$, and the third term is the cumulative customer demand that has been observed at the central warehouse up through time period $t$.
 
-The uncertainty sets have the form 
-``` math
-{U}_1 \equiv [\underline{D}_1,\bar{D}_1], \ldots, {U}_{T+1} \equiv [\underline{D}_{T+1},\bar{D}_{T+1}]
-```
-with $\underline{D}_1 = \bar{D}_1 = 1$ and $\underline{D}_{t+1} < \bar{D}_{t+1}$ for each time period $t \in [T]$.
-
 ### Decision variables
 We utilize linear decision rule for the above robust optimization problems. More specifically, we set 
 ``` math
@@ -357,14 +351,14 @@ V_{\textnormal{min}} \le  v_1 + \sum_{\ell=1}^t \sum_{e=1}^E \left( \sum_{s=1}^\
 ### Instance generation
 We generate the instance following [G], which generalized those from [F]. More specifically, we generate instances in which the customer demand and production costs of a new product follow a cyclic  pattern due to seasonality over a selling horizon of one year. 
 
-Given a discretization of the selling season into $T$ stages, the  customer demand in ``` math
-    \phi_t &= 1 + 0.5 \sin\left(\frac{2 \pi (t-2)}{T} \right), & \theta_t &= 0.2, &  {U}_t &=  \left[ \frac{1000  (1 - \theta)  \phi_t}{T / 24}, \frac{1000 (1+\theta)  \phi_t}{T/24}  \right], 
+Given a discretization of the selling season into $T$ stages, the  customer demand in 
+``` math
+    \phi_t = 1 + 0.5 \sin\left(\frac{2 \pi (t-2)}{T} \right), \theta_t = 0.2,  {U}_t =  \left[ \frac{1000  (1 - \theta)  \phi_t}{T / 24}, \frac{1000 (1+\theta)  \phi_t}{T/24}  \right], 
 ```
 
-Given $E$ factories available to the firm, 
-the production costs and capacities for each stage $t \in [T]$ and each factory $e \in [E]$ are 
+Given $E$ factories available to the firm, the production costs and capacities for each stage $t \in [T]$ and each factory $e \in [E]$ are 
 ``` math
-    c_{te} &= \left(1 + \frac{e-1}{E-1} \right) \phi_t, & p_{te} &= \frac{567}{\left( T/24\right)\left(E/3 \right)}, & Q_e &= \frac{13600}{E / 3},\label{prob:experiment_setup:2}
+    c_{te} = \left(1 + \frac{e-1}{E-1} \right) \phi_t,  p_{te} &= \frac{567}{\left( T/24\right)\left(E/3 \right)},  Q_e = \frac{13600}{E / 3},
 ```
     and the capacities and initial inventory at the central warehouse are 
 ``` math
