@@ -185,7 +185,7 @@ u_{N,j,k} = 0 \quad u_{i,N,k} = 0 \quad u_{i,j,N} = 0.
 ```
 Then at the measurement locations $M$ we have
 ``` math
-u_{i,j,k}^\star = u_{i,j,k}  \quad \forall (i,j,k) \in M.
+u_{i,j,k}^\star = u_{i,j,k}  \quad ~~\forall (i,j,k) \in M.
 ```
 
 ### Instance generation
@@ -334,19 +334,19 @@ x_{te}=\sum_{s=1}^t y_{t,s,e} \zeta_s.
 ### Optimization model
 Minimize the worst-case cost with uncertianty:
 ``` math
-\underset{\substack{y_{t,1},\ldots,y_{t,t} \in R^E:\;  \forall t = 1, ..., T}}{\textnormal{minimize}} \max_{\zeta_1 \in {U}_1,\ldots,\zeta_{T+1} \in {U}_{T+1}} \left \{ \sum_{t=1}^T \sum_{e=1}^E c_{te} \left( \sum_{s=1}^t    y_{t,s,e} \zeta_s\right) \right \}.
+\underset{\substack{y_{t,1},\ldots,y_{t,t} \in R^E:\;  ~~\forall t = 1, ..., T}}{\textnormal{minimize}} \max_{\zeta_1 \in {U}_1,\ldots,\zeta_{T+1} \in {U}_{T+1}} \left \{ \sum_{t=1}^T \sum_{e=1}^E c_{te} \left( \sum_{s=1}^t    y_{t,s,e} \zeta_s\right) \right \}.
 ```
 Subject to the following constraints. Maximal total production level for each factory:
 ``` math
-\sum_{t=1}^T  \left( \sum_{s=1}^t y_{t,s,e} \zeta_s \right) \le  Q_e   \forall e = 1, ..., E.
+\sum_{t=1}^T  \left( \sum_{s=1}^t y_{t,s,e} \zeta_s \right) \le  Q_e   ~~\forall e = 1, ..., E.
 ```
 Maximal and minimal production level for each factor at a time period:
 ``` math
-0 \le \left( \sum_{s=1}^t y_{t,s,e} \zeta_s \right) \le  p_{te}  \forall  e = 1, ..., E,\; t = 1, ..., T.
+0 \le \left( \sum_{s=1}^t y_{t,s,e} \zeta_s \right) \le  p_{te}  ~~\forall  e = 1, ..., E,\; t = 1, ..., T.
 ```
 The remaining  inventory  in the warehouse lies within a  pre-specified interval:
 ``` math
-V_{\textnormal{min}} \le  v_1 + \sum_{\ell=1}^t \sum_{e=1}^E \left( \sum_{s=1}^\ell y_{\ell,s,e} \zeta_s \right)  - \sum_{s=2}^{t+1} \zeta_s  \le  V_{\textnormal{max}} \forall  t = 1, ..., T.
+V_{\textnormal{min}} \le  v_1 + \sum_{\ell=1}^t \sum_{e=1}^E \left( \sum_{s=1}^\ell y_{\ell,s,e} \zeta_s \right)  - \sum_{s=2}^{t+1} \zeta_s  \le  V_{\textnormal{max}} ~~\forall  t = 1, ..., T.
 ```
 ### Instance generation
 We generate the instance following [G], which generalized those from [F]. More specifically, we generate instances in which the customer demand and production costs of a new product follow a cyclic  pattern due to seasonality over a selling horizon of one year. 
