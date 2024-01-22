@@ -316,7 +316,7 @@ The demand at the central warehouse is denoted by
 ``` math
 \zeta_{t+1} \in {U}_{t+1} \equiv [\underline{D}_{t+1},\bar{D}_{t+1}]
 ```
-which must be satisfied immediately without backlogging from the inventory in  the central warehouse. The lower and upper bounds in the uncertainty set, denoted by  $\underline{D}_{t+1} < \bar{D}_{t+1}$, capture the minimum and maximum level of customer demand that the firm anticipates  receiving in each time period $t$.
+which must be satisfied immediately without backlogging from the inventory in  the central warehouse. The lower and upper bounds in the uncertainty set, denoted by  $\underline{D}_{t+1} < \bar{D}_{t+1}$ , capture the minimum and maximum level of customer demand that the firm anticipates  receiving in each time period $t$.
 
 The remaining inventory level in the central warehouse at the end of each time period $t = 1, ..., T$ must satisfy
 ``` math
