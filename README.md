@@ -312,7 +312,11 @@ The goal of the firm is to satisfy the customer demand at minimal cost while sat
 
 Let  $x_{te} \ge 0$ denote the number of product units that the firm decides to produce at each of the factories $e \in [E] \equiv \{1,\ldots,E\}$ at a per-unit cost of $c_{te}$. 
 
-The demand at the central warehouse is denoted by $\zeta_{t+1} \in {U}_{t+1} \equiv [\ubar{D}_{t+1},\bar{D}_{t+1}]$, which must be satisfied immediately without backlogging from the inventory in  the central warehouse. The lower and upper bounds in the uncertainty set, denoted by  $\ubar{D}_{t+1} < \bar{D}_{t+1}$, capture the minimum and maximum level of customer demand that the firm anticipates  receiving in each time period $t$.
+The demand at the central warehouse is denoted by 
+``` math
+\zeta_{t+1} \in {U}_{t+1} \equiv [\ubar{D}_{t+1},\bar{D}_{t+1}]
+```
+which must be satisfied immediately without backlogging from the inventory in  the central warehouse. The lower and upper bounds in the uncertainty set, denoted by  $\ubar{D}_{t+1} < \bar{D}_{t+1}$, capture the minimum and maximum level of customer demand that the firm anticipates  receiving in each time period $t$.
 
 The remaining inventory level in the central warehouse at the end of each time period $t \in [T]$ must satisfy
 ``` math
