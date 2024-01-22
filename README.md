@@ -316,7 +316,7 @@ The demand at the central warehouse is denoted by
 ``` math
 \zeta_{t+1} \in {U}_{t+1} \equiv [\underline{D}_{t+1},\bar{D}_{t+1}]
 ```
-which must be satisfied immediately without backlogging from the inventory in  the central warehouse. The lower and upper bounds in the uncertainty set, denoted by  $\underline{D}_{t+1} < \bar{D}_{t+1}$ , capture the minimum and maximum level of customer demand that the firm anticipates  receiving in each time period $t$.
+which must be satisfied immediately without backlogging from the inventory in  the central warehouse. The lower and upper bounds in the uncertainty set, denoted by  $\underline{D}\_{t+1} < \bar{D}\_{t+1},$ capture the minimum and maximum level of customer demand that the firm anticipates  receiving in each time period $t$.
 
 The remaining inventory level in the central warehouse at the end of each time period $t = 1, ..., T$ must satisfy
 ``` math
@@ -325,14 +325,14 @@ The remaining inventory level in the central warehouse at the end of each time p
 where $v_1$ is the initial inventory level in the central warehouse at the beginning of the selling horizon, the second term is the cumulative number of product units that have been produced at the factories up through time period $t$, and the third term is the cumulative customer demand that has been observed at the central warehouse up through time period $t$.
 
 ### Decision variables
-We utilize linear decision rule for the above robust optimization problems. More specifically, we set 
+We utilize a linear decision rule for the above robust optimization problems. More specifically, we set 
 ``` math
 x_{te}=\sum_{s=1}^t y_{t,s,e} \zeta_s.
 ```
  The decision variable is the linear decision rule parameter $y_{t,s,e}$.
 
 ### Optimization model
-Minimize the worst-case cost with uncertianty:
+Minimize the worst-case cost with uncertainty:
 ``` math
 \underset{\substack{y_{t,1},\ldots,y_{t,t} \in R^E:\;  ~~\quad\forall t = 1, ..., T}}{\textnormal{minimize}} \max_{\zeta_1 \in {U}_1,\ldots,\zeta_{T+1} \in {U}_{T+1}} \left \{ \sum_{t=1}^T \sum_{e=1}^E c_{te} \left( \sum_{s=1}^t    y_{t,s,e} \zeta_s\right) \right \}.
 ```
