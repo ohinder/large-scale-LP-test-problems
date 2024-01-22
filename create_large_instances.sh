@@ -40,5 +40,4 @@ julia --project generate-production-inventory.jl \
     --output_file large-problem-instances/production-inventory.mps.gz \
     --num_factories 100 \
     --num_stages 200 \
-    --uncertainty_level 0.2 \
-    --seed 1
+    --uncertainty_level 0.2
