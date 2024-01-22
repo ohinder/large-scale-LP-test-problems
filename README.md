@@ -314,7 +314,7 @@ Let  $x_{te} \ge 0$ denote the number of product units that the firm decides to 
 
 The demand at the central warehouse is denoted by 
 ``` math
-\zeta_{t+1} \in {U}_{t+1} \equiv [\underbar{D}_{t+1},\bar{D}_{t+1}]
+\zeta_{t+1} \in {U}_{t+1} \equiv [\underline{D}_{t+1},\bar{D}_{t+1}]
 ```
 which must be satisfied immediately without backlogging from the inventory in  the central warehouse. The lower and upper bounds in the uncertainty set, denoted by  $\ubar{D}_{t+1} < \bar{D}_{t+1}$, capture the minimum and maximum level of customer demand that the firm anticipates  receiving in each time period $t$.
 
