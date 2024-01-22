@@ -316,7 +316,7 @@ The demand at the central warehouse is denoted by
 ``` math
 \zeta_{t+1} \in {U}_{t+1} \equiv [\underline{D}_{t+1},\bar{D}_{t+1}]
 ```
-which must be satisfied immediately without backlogging from the inventory in  the central warehouse. The lower and upper bounds in the uncertainty set, denoted by  $\ubar{D}_{t+1} < \bar{D}_{t+1}$, capture the minimum and maximum level of customer demand that the firm anticipates  receiving in each time period $t$.
+which must be satisfied immediately without backlogging from the inventory in  the central warehouse. The lower and upper bounds in the uncertainty set, denoted by  $\underline{D}_{t+1} < \bar{D}_{t+1}$, capture the minimum and maximum level of customer demand that the firm anticipates  receiving in each time period $t$.
 
 The remaining inventory level in the central warehouse at the end of each time period $t \in [T]$ must satisfy
 ``` math
@@ -324,8 +324,8 @@ The remaining inventory level in the central warehouse at the end of each time p
 ```
 where $v_1$ is the initial inventory level in the central warehouse at the beginning of the selling horizon, $\sum_{\ell =1}^t  \sum_{e=1}^E x_{\ell e}$ is the cumulative number of product units that have been produced at the factories up through time period $t$, and $\sum_{s=2}^{t+1} \zeta_s$ is the cumulative customer demand that has been observed at the central warehouse up through time period $t$.
 
-The uncertainty sets have the form ${U}_1 \equiv [\ubar{D}_1,\bar{D}_1], \ldots, {U}_{T+1} \equiv [\ubar{D}_{T+1},\bar{D}_{T+1}]$ 
-with $\ubar{D}_1 = \bar{D}_1 = 1$ and $\ubar{D}_{t+1} < \bar{D}_{t+1}$ for each time period $t \in [T]$.
+The uncertainty sets have the form ${U}_1 \equiv [\underline{D}_1,\bar{D}_1], \ldots, {U}_{T+1} \equiv [\underline{D}_{T+1},\bar{D}_{T+1}]$ 
+with $\underline{D}_1 = \bar{D}_1 = 1$ and $\underline{D}_{t+1} < \bar{D}_{t+1}$ for each time period $t \in [T]$.
 
 ### Decision variables
 We utilize linear decision rule for the above robust optimization problems. More specifically, we set $x_{te}=\sum_{s=1}^t y_{t,s,e} \zeta_s$. The decision variable is the linear decision rule parameter $y_{t,s,e}$.
