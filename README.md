@@ -310,7 +310,7 @@ The goal of the firm is to satisfy the customer demand at minimal cost while sat
 
 ### Parameters
 
-Let  $x_{te} \ge 0$ denote the number of product units that the firm decides to produce at each of the factories $e = 1, ..., E $ at a per-unit cost of $c_{te}$. 
+Let  $x_{te} \ge 0$ denote the number of product units that the firm decides to produce at each of the factories $e = 1, ..., E$ at a per-unit cost of $c_{te}$. 
 
 The demand at the central warehouse is denoted by 
 ``` math
