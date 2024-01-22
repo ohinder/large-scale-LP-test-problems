@@ -322,18 +322,25 @@ The remaining inventory level in the central warehouse at the end of each time p
 ``` math
     V_{\text{min}} \le  v_1 + \sum_{\ell =1}^t  \sum_{e=1}^E x_{\ell e} - \sum_{s=2}^{t+1} \zeta_s \le V_{\text{max}},
 ```
-where $v_1$ is the initial inventory level in the central warehouse at the beginning of the selling horizon, $\sum_{\ell =1}^t  \sum_{e=1}^E x_{\ell e}$ is the cumulative number of product units that have been produced at the factories up through time period $t$, and $\sum_{s=2}^{t+1} \zeta_s$ is the cumulative customer demand that has been observed at the central warehouse up through time period $t$.
+where $v_1$ is the initial inventory level in the central warehouse at the beginning of the selling horizon, the second term is the cumulative number of product units that have been produced at the factories up through time period $t$, and the third term is the cumulative customer demand that has been observed at the central warehouse up through time period $t$.
 
-The uncertainty sets have the form ${U}_1 \equiv [\underline{D}_1,\bar{D}_1], \ldots, {U}_{T+1} \equiv [\underline{D}_{T+1},\bar{D}_{T+1}]$ 
+The uncertainty sets have the form 
+``` math
+{U}_1 \equiv [\underline{D}_1,\bar{D}_1], \ldots, {U}_{T+1} \equiv [\underline{D}_{T+1},\bar{D}_{T+1}]
+```
 with $\underline{D}_1 = \bar{D}_1 = 1$ and $\underline{D}_{t+1} < \bar{D}_{t+1}$ for each time period $t \in [T]$.
 
 ### Decision variables
-We utilize linear decision rule for the above robust optimization problems. More specifically, we set $x_{te}=\sum_{s=1}^t y_{t,s,e} \zeta_s$. The decision variable is the linear decision rule parameter $y_{t,s,e}$.
+We utilize linear decision rule for the above robust optimization problems. More specifically, we set 
+``` math
+x_{te}=\sum_{s=1}^t y_{t,s,e} \zeta_s.
+```
+ The decision variable is the linear decision rule parameter $y_{t,s,e}$.
 
 ### Optimization model
 Minimize the worst-case cost with uncertianty:
 ``` math
-\underset{\substack{y_{t,1},\ldots,y_{t,t} \in \R^E:\;  \forall t \in [T]}}{\textnormal{minimize}} \max_{\zeta_1 \in {U}_1,\ldots,\zeta_{T+1} \in {U}_{T+1}} \left \{ \sum_{t=1}^T \sum_{e=1}^E c_{te} \left( \sum_{s=1}^t    y_{t,s,e} \zeta_s\right) \right \}.
+\underset{\substack{y_{t,1},\ldots,y_{t,t} \in R^E:\;  \forall t \in [T]}}{\textnormal{minimize}} \max_{\zeta_1 \in {U}_1,\ldots,\zeta_{T+1} \in {U}_{T+1}} \left \{ \sum_{t=1}^T \sum_{e=1}^E c_{te} \left( \sum_{s=1}^t    y_{t,s,e} \zeta_s\right) \right \}.
 ```
 Subject to the following constraints. Maximal total production level for each factory:
 ``` math
@@ -345,7 +352,7 @@ Maximal and minimal production level for each factor at a time period:
 ```
 The remaining  inventory  in the warehouse lies within a  pre-specified interval:
 ``` math
-V_{\textnormal{min}} \le  v_1 + \sum_{\ell=1}^t \sum_{e=1}^E \left( \sum_{s=1}^\ell y_{\ell,s,e} \zeta_s \right)  - \sum_{s=2}^{t+1} \zeta_s  \le  V_{\textnormal{max}}&& \forall  t \in [T].
+V_{\textnormal{min}} \le  v_1 + \sum_{\ell=1}^t \sum_{e=1}^E \left( \sum_{s=1}^\ell y_{\ell,s,e} \zeta_s \right)  - \sum_{s=2}^{t+1} \zeta_s  \le  V_{\textnormal{max}} \forall  t \in [T].
 ```
 ### Instance generation
 We generate the instance following [G], which generalized those from [F]. More specifically, we generate instances in which the customer demand and production costs of a new product follow a cyclic  pattern due to seasonality over a selling horizon of one year. 
