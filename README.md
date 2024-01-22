@@ -193,7 +193,7 @@ u_{i,j,k}^\star = u_{i,j,k}  \quad \forall (i,j,k) \in M.
 We generate $v_1, \dots, v_m$ measurement locations uniformly at random
 from $[0,1]^3$ and potential locations for the heat sources $w_1, \dots, w_n$ uniformly at random
 from $[0,1]^3$. Then
-from the $n$ potential locations for the heat sources we choose uniformly at random $l$ location different to place the heat sources, denoted by the set $\mathcal{L}$ where $l < n$. At each location with a heat source we generate the 
+from the $n$ potential locations for the heat sources we choose uniformly at random $l$ location different to place the heat sources, denoted by the set ${L}$ where $l < n$. At each location with a heat source we generate the 
 total inputted heat uniformly between zero and one.
 We then generate our grid and round the positional vectors to the nearest point in the grid. 
 This yields a set $M$ of indices for the measurement locations.
@@ -312,7 +312,7 @@ The goal of the firm is to satisfy the customer demand at minimal cost while sat
 
 Let  $x_{te} \ge 0$ denote the number of product units that the firm decides to produce at each of the factories $e \in [E] \equiv \{1,\ldots,E\}$ at a per-unit cost of $c_{te}$. 
 
-The demand at the central warehouse is denoted by $\zeta_{t+1} \in \mathcal{U}_{t+1} \equiv [\ubar{D}_{t+1},\bar{D}_{t+1}]$, which must be satisfied immediately without backlogging from the inventory in  the central warehouse. The lower and upper bounds in the uncertainty set, denoted by  $\ubar{D}_{t+1} < \bar{D}_{t+1}$, capture the minimum and maximum level of customer demand that the firm anticipates  receiving in each time period $t$.
+The demand at the central warehouse is denoted by $\zeta_{t+1} \in {U}_{t+1} \equiv [\ubar{D}_{t+1},\bar{D}_{t+1}]$, which must be satisfied immediately without backlogging from the inventory in  the central warehouse. The lower and upper bounds in the uncertainty set, denoted by  $\ubar{D}_{t+1} < \bar{D}_{t+1}$, capture the minimum and maximum level of customer demand that the firm anticipates  receiving in each time period $t$.
 
 The remaining inventory level in the central warehouse at the end of each time period $t \in [T]$ must satisfy
 ``` math
@@ -320,7 +320,7 @@ The remaining inventory level in the central warehouse at the end of each time p
 ```
 where $v_1$ is the initial inventory level in the central warehouse at the beginning of the selling horizon, $\sum_{\ell =1}^t  \sum_{e=1}^E x_{\ell e}$ is the cumulative number of product units that have been produced at the factories up through time period $t$, and $\sum_{s=2}^{t+1} \zeta_s$ is the cumulative customer demand that has been observed at the central warehouse up through time period $t$.
 
-The uncertainty sets have the form $\mathcal{U}_1 \equiv [\ubar{D}_1,\bar{D}_1], \ldots, \mathcal{U}_{T+1} \equiv [\ubar{D}_{T+1},\bar{D}_{T+1}]$ 
+The uncertainty sets have the form ${U}_1 \equiv [\ubar{D}_1,\bar{D}_1], \ldots, {U}_{T+1} \equiv [\ubar{D}_{T+1},\bar{D}_{T+1}]$ 
 with $\ubar{D}_1 = \bar{D}_1 = 1$ and $\ubar{D}_{t+1} < \bar{D}_{t+1}$ for each time period $t \in [T]$.
 
 ### Decision variables
@@ -329,7 +329,7 @@ We utilize linear decision rule for the above robust optimization problems. More
 ### Optimization model
 Minimize the worst-case cost with uncertianty:
 ``` math
-\underset{\substack{y_{t,1},\ldots,y_{t,t} \in \R^E:\;  \forall t \in [T]}}{\textnormal{minimize}} \max_{\zeta_1 \in \mathcal{U}_1,\ldots,\zeta_{T+1} \in \mathcal{U}_{T+1}} \left \{ \sum_{t=1}^T \sum_{e=1}^E c_{te} \left( \sum_{s=1}^t    y_{t,s,e} \zeta_s\right) \right \}.
+\underset{\substack{y_{t,1},\ldots,y_{t,t} \in \R^E:\;  \forall t \in [T]}}{\textnormal{minimize}} \max_{\zeta_1 \in {U}_1,\ldots,\zeta_{T+1} \in {U}_{T+1}} \left \{ \sum_{t=1}^T \sum_{e=1}^E c_{te} \left( \sum_{s=1}^t    y_{t,s,e} \zeta_s\right) \right \}.
 ```
 Subject to the following constraints. Maximal total production level for each factory:
 ``` math
@@ -347,7 +347,7 @@ V_{\textnormal{min}} \le  v_1 + \sum_{\ell=1}^t \sum_{e=1}^E \left( \sum_{s=1}^\
 We generate the instance following [G], which generalized those from [F]. More specifically, we generate instances in which the customer demand and production costs of a new product follow a cyclic  pattern due to seasonality over a selling horizon of one year. 
 
 Given a discretization of the selling season into $T$ stages, the  customer demand in ``` math
-    \phi_t &= 1 + 0.5 \sin\left(\frac{2 \pi (t-2)}{T} \right), & \theta_t &= 0.2, &  \mathcal{U}_t &=  \left[ \frac{1000  (1 - \theta)  \phi_t}{T / 24}, \frac{1000 (1+\theta)  \phi_t}{T/24}  \right], 
+    \phi_t &= 1 + 0.5 \sin\left(\frac{2 \pi (t-2)}{T} \right), & \theta_t &= 0.2, &  {U}_t &=  \left[ \frac{1000  (1 - \theta)  \phi_t}{T / 24}, \frac{1000 (1+\theta)  \phi_t}{T/24}  \right], 
 ```
 
 Given $E$ factories available to the firm, 
