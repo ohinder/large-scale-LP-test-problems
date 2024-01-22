@@ -310,7 +310,7 @@ The goal of the firm is to satisfy the customer demand at minimal cost while sat
 
 ### Parameters
 
-Let  $x_{te} \ge 0$ denote the number of product units that the firm decides to produce at each of the factories $e \in [E] \equiv \{1,\ldots,E\}$ at a per-unit cost of $c_{te}$. 
+Let  $x_{te} \ge 0$ denote the number of product units that the firm decides to produce at each of the factories $e = 1, ..., E \}$ at a per-unit cost of $c_{te}$. 
 
 The demand at the central warehouse is denoted by 
 ``` math
@@ -318,7 +318,7 @@ The demand at the central warehouse is denoted by
 ```
 which must be satisfied immediately without backlogging from the inventory in  the central warehouse. The lower and upper bounds in the uncertainty set, denoted by  $\underline{D}_{t+1} < \bar{D}_{t+1}$, capture the minimum and maximum level of customer demand that the firm anticipates  receiving in each time period $t$.
 
-The remaining inventory level in the central warehouse at the end of each time period $t \in [T]$ must satisfy
+The remaining inventory level in the central warehouse at the end of each time period $t = 1, ..., T$ must satisfy
 ``` math
     V_{\text{min}} \le  v_1 + \sum_{\ell =1}^t  \sum_{e=1}^E x_{\ell e} - \sum_{s=2}^{t+1} \zeta_s \le V_{\text{max}},
 ```
@@ -334,19 +334,19 @@ x_{te}=\sum_{s=1}^t y_{t,s,e} \zeta_s.
 ### Optimization model
 Minimize the worst-case cost with uncertianty:
 ``` math
-\underset{\substack{y_{t,1},\ldots,y_{t,t} \in R^E:\;  \forall t \in [T]}}{\textnormal{minimize}} \max_{\zeta_1 \in {U}_1,\ldots,\zeta_{T+1} \in {U}_{T+1}} \left \{ \sum_{t=1}^T \sum_{e=1}^E c_{te} \left( \sum_{s=1}^t    y_{t,s,e} \zeta_s\right) \right \}.
+\underset{\substack{y_{t,1},\ldots,y_{t,t} \in R^E:\;  \forall t = 1, ..., T}}{\textnormal{minimize}} \max_{\zeta_1 \in {U}_1,\ldots,\zeta_{T+1} \in {U}_{T+1}} \left \{ \sum_{t=1}^T \sum_{e=1}^E c_{te} \left( \sum_{s=1}^t    y_{t,s,e} \zeta_s\right) \right \}.
 ```
 Subject to the following constraints. Maximal total production level for each factory:
 ``` math
-\sum_{t=1}^T  \left( \sum_{s=1}^t y_{t,s,e} \zeta_s \right) \le  Q_e   \forall e \in[E].
+\sum_{t=1}^T  \left( \sum_{s=1}^t y_{t,s,e} \zeta_s \right) \le  Q_e   \forall e = 1, ..., E.
 ```
 Maximal and minimal production level for each factor at a time period:
 ``` math
-0 \le \left( \sum_{s=1}^t y_{t,s,e} \zeta_s \right) \le  p_{te}  \forall  e\in[E],\; t \in [T].
+0 \le \left( \sum_{s=1}^t y_{t,s,e} \zeta_s \right) \le  p_{te}  \forall  e = 1, ..., E,\; t = 1, ..., T.
 ```
 The remaining  inventory  in the warehouse lies within a  pre-specified interval:
 ``` math
-V_{\textnormal{min}} \le  v_1 + \sum_{\ell=1}^t \sum_{e=1}^E \left( \sum_{s=1}^\ell y_{\ell,s,e} \zeta_s \right)  - \sum_{s=2}^{t+1} \zeta_s  \le  V_{\textnormal{max}} \forall  t \in [T].
+V_{\textnormal{min}} \le  v_1 + \sum_{\ell=1}^t \sum_{e=1}^E \left( \sum_{s=1}^\ell y_{\ell,s,e} \zeta_s \right)  - \sum_{s=2}^{t+1} \zeta_s  \le  V_{\textnormal{max}} \forall  t = 1, ..., T.
 ```
 ### Instance generation
 We generate the instance following [G], which generalized those from [F]. More specifically, we generate instances in which the customer demand and production costs of a new product follow a cyclic  pattern due to seasonality over a selling horizon of one year. 
@@ -356,11 +356,11 @@ Given a discretization of the selling season into $T$ stages, the  customer dema
     \phi_t = 1 + 0.5 \sin\left(\frac{2 \pi (t-2)}{T} \right), \theta_t = 0.2,  {U}_t =  \left[ \frac{1000  (1 - \theta)  \phi_t}{T / 24}, \frac{1000 (1+\theta)  \phi_t}{T/24}  \right], 
 ```
 
-Given $E$ factories available to the firm, the production costs and capacities for each stage $t \in [T]$ and each factory $e \in [E]$ are 
+Given $E$ factories available to the firm, the production costs and capacities for each stage $t = 1, ..., T$ and each factory $e = 1, ..., E$ are 
 ``` math
-    c_{te} = \left(1 + \frac{e-1}{E-1} \right) \phi_t,  p_{te} &= \frac{567}{\left( T/24\right)\left(E/3 \right)},  Q_e = \frac{13600}{E / 3},
+    c_{te} = \left(1 + \frac{e-1}{E-1} \right) \phi_t,  p_{te} = \frac{567}{\left( T/24\right)\left(E/3 \right)},  Q_e = \frac{13600}{E / 3},
 ```
-    and the capacities and initial inventory at the central warehouse are 
+and the capacities and initial inventory at the central warehouse are 
 ``` math
 V_{\text{min}} = 500, \quad V_{\text{max}} = 2000, \quad v_1 = 500.
 ```
