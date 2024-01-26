@@ -1,10 +1,10 @@
 mkdir large-problem-instances
 
 julia --project generate-multicommodity-flow.jl \
-    --output_file large-problem-instances/multicommodity-flow-small-test-instance.mps.gz \
-    --num_commodities 40000 \
+    --output_file large-problem-instances/multicommodity-flow-instance.mps.gz \
+    --num_commodities 20000 \
     --num_warehouses 100 \
-    --num_stores 2000 \
+    --num_stores 1000 \
     --seed 1
 
 julia --project generate-heat-source-location.jl \

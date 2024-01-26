@@ -1,7 +1,7 @@
 mkdir small-problem-instances
 
 julia --project generate-multicommodity-flow.jl \
-  --output_file small-problem-instances/multicommodity-flow-small-test-instance.mps.gz \
+  --output_file small-problem-instances/multicommodity-flow-instance.mps.gz \
   --num_commodities 100 \
   --num_warehouses 30 \
   --num_stores 100 \

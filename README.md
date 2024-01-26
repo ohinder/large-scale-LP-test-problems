@@ -20,7 +20,7 @@ To create large versions of the problem instances (for testing) run.
 $ ./create_large_instances.sh
 ```
 This is going to take a while and you will need a machine 
-with $`\ge 32`$GB of RAM. 
+with $`\ge 512`$GB of RAM. 
 
 These generate random instances, the scrips set fixed seeds for the 
 random number generator. If you want to generate new instances, make sure to modify 
@@ -57,7 +57,7 @@ and larger models incorporating, for example,
 the multiperiod aspect of the problem or the issue of deciding where 
 to build new warehouses.
 
-For the `create_large_instances.sh` we use 40000 commodities, 100 warehouses and 2000 stores. For context, Walmart has over 4000 stores in the United States, and the company has over 200 distribution centers [E]. Moreover, the average Walmart
+For the `create_large_instances.sh` we use 20000 commodities, 100 warehouses and 1000 stores. For context, Walmart has over 4000 stores in the United States, and the company has over 200 distribution centers [E]. Moreover, the average Walmart
 store sells around 120,000 different products [D].
 
 ### Decision variables
