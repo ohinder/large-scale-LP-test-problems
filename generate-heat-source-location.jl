@@ -243,6 +243,7 @@ function main()
         parsed_args["tmp_folder"]
     )
 
+    rm(parsed_args["ground_truth_file"])
     HDF5.h5write(parsed_args["ground_truth_file"], "u_true", u_true)
     write_to_file(model, parsed_args["output_file"])
 end
