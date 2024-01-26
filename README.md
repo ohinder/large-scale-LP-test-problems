@@ -14,7 +14,7 @@ To create small versions of the problem instances (for testing) run:
 $ ./create_small_instances.sh
 ```
 
-To create large versions of the problem instances (for testing) run.
+To create large versions of the problem instances run:
 
 ```shell
 $ ./create_large_instances.sh
