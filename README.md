@@ -19,12 +19,19 @@ To create large versions of the problem instances run:
 ```shell
 $ ./create_large_instances.sh
 ```
-This is going to take a while and you will need a machine 
-with $`\ge 512`$GB of RAM. 
 
-These generate random instances, the scrips set fixed seeds for the 
-random number generator. If you want to generate new instances, make sure to modify 
-the seeds (see the code of the scripts above).
+This is going to take a while and you will need a machine 
+with $`\ge 512`$GB of RAM.
+
+You can modify the instance generation properties and seeds.
+Take a look at the above shell files for examples of parameters
+that you can pass to the generators. For more information
+on the parameters for each generator you can use `--help`,
+for example, for `generate-multicommodity-flow.jl` you can run
+
+```shell
+julia --project generate-multicommodity-flow.jl --help
+```
 
 # Background on problems
 
