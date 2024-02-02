@@ -1,4 +1,4 @@
-mkdir large-problem-instances
+mkdir -p large-problem-instances
 
 julia --project generate-multicommodity-flow.jl \
     --output_file large-problem-instances/multicommodity-flow-instance.mps.gz \
