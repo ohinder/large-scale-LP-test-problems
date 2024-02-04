@@ -2,7 +2,7 @@
 
 julia_version = "1.10.0"
 manifest_format = "2.0"
-project_hash = "1a66d373faf95d9f06ecda74f5833a797f2438f3"
+project_hash = "a3a32118078c628699bc15c9ceda80ed53311347"
 
 [[deps.ArgParse]]
 deps = ["Logging", "TextWrap"]
@@ -809,12 +809,6 @@ uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 [[deps.Profile]]
 deps = ["Printf"]
 uuid = "9abbd945-dff8-562f-b5e8-e1ebf5ef1b79"
-
-[[deps.QPSReader]]
-deps = ["Logging", "Pkg"]
-git-tree-sha1 = "374833c0c1fd5cc623278581bf0c8259d7b35f10"
-uuid = "10f199a5-22af-520b-b891-7ce84a7b1bd0"
-version = "0.2.1"
 
 [[deps.Qt6Base_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Fontconfig_jll", "Glib_jll", "JLLWrappers", "Libdl", "Libglvnd_jll", "OpenSSL_jll", "Vulkan_Loader_jll", "Xorg_libSM_jll", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Xorg_libxcb_jll", "Xorg_xcb_util_cursor_jll", "Xorg_xcb_util_image_jll", "Xorg_xcb_util_keysyms_jll", "Xorg_xcb_util_renderutil_jll", "Xorg_xcb_util_wm_jll", "Zlib_jll", "libinput_jll", "xkbcommon_jll"]

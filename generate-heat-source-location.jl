@@ -5,28 +5,15 @@ using ArgParse
 import HDF5
 using LinearAlgebra
 using JuMP, SCS
-using QPSReader, SparseArrays, IterativeSolvers
+using SparseArrays, IterativeSolvers
 using Base
 
-function write_pde_problem_to_file(pde_model, pde_mps_file_name::String)
-    write_to_file(pde_model, pde_mps_file_name) # this uses a lot of memory
-end
-
-function load_problem_pde_problem(pde_mps_file_name::String)
-    qpsreader_model = readqps(pde_mps_file_name)
-    rhs = qpsreader_model.lcon
-    original_A = sparse(qpsreader_model.arows, 
-                        qpsreader_model.acols, 
-                        qpsreader_model.avals)
-    
-    uvars = qpsreader_model.uvar
-    lvars = qpsreader_model.lvar
-    varnames = qpsreader_model.varnames
-    return uvars, lvars, rhs, original_A, varnames
-end
-
-function solve_pde_linear_system(N::Int64, pde_mps_file_name::String)
-    uvars, lvars, rhs, A, varnames = load_problem_pde_problem(pde_mps_file_name)
+function solve_pde_linear_system(N::Int64, data::JuMP.LPMatrixData)
+    uvars = data.x_upper
+    lvars = data.x_lower
+    rhs = data.b_lower
+    A = data.A
+    varnames = [name(x) for x in data.variables]
 
     u_true_dict = Dict()
     keep_indicies = Vector{Int64}()
@@ -102,7 +89,6 @@ function build_heat_source_detection_problem(
     num_measurement_locations::Int64,
     grid_size::Int64,
     maximum_relative_measurement_error::Float64,
-    tmp_folder::String
 )
     @assert num_source_locations < num_possible_source_locations
     @assert grid_size > 2
@@ -123,14 +109,11 @@ function build_heat_source_detection_problem(
     ##################
 
     println("computing u_true")
-    pde_mps_file_name =  "$tmp_folder/tmp_pde.mps"
-    begin
-        pde_model = Model()
-        @variable(pde_model, u[i=0:(grid_size+1), j=0:(grid_size+1), k=0:(grid_size+1)])
-        build_discretized_possion!(pde_model, u, q, grid_size)
-        write_pde_problem_to_file(pde_model, pde_mps_file_name)
-    end
-    u_true = solve_pde_linear_system(grid_size, pde_mps_file_name)
+
+    pde_model = Model()
+    @variable(pde_model, u[i=0:(grid_size+1), j=0:(grid_size+1), k=0:(grid_size+1)])
+    build_discretized_possion!(pde_model, u, q, grid_size)
+    u_true = solve_pde_linear_system(grid_size, lp_matrix_data(pde_model))
 
     println("computed u_true")
 
@@ -217,9 +200,6 @@ function parse_commandline()
         "--output_file"
         help = "This is the location that the mps file will be written to."
         required = true
-        "--tmp_folder"
-        help = "This is the location that the a temporary mps file will be written."
-        required = true
     end
 
     return parse_args(s)
@@ -240,7 +220,6 @@ function main()
         parsed_args["num_measurement_locations"],
         parsed_args["grid_size"],
         parsed_args["maximum_relative_measurement_error"],
-        parsed_args["tmp_folder"]
     )
 
     if isfile(parsed_args["ground_truth_file"])

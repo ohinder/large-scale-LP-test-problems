@@ -14,8 +14,7 @@ julia --project generate-heat-source-location.jl \
   --num_source_locations 3 \
   --num_possible_source_locations 100 \
   --seed 1 \
-  --num_measurement_locations 80 \
-  --tmp_folder /tmp
+  --num_measurement_locations 80
 
 julia --project generate-heat-source-location.jl \
   --output_file small-problem-instances/heat-source-instance2.mps.gz \
@@ -24,8 +23,7 @@ julia --project generate-heat-source-location.jl \
   --num_source_locations 3 \
   --num_possible_source_locations 100 \
   --seed 2 \
-  --num_measurement_locations 40 \
-  --tmp_folder /tmp
+  --num_measurement_locations 40
 
 # Note: we calculate epsilon = 1/sqrt(num_treatment_samples) = 0.0141
 julia --project design-matching-synthetic.jl \
