@@ -14,7 +14,6 @@ julia --project generate-heat-source-location.jl \
     --num_source_locations 10 \
     --num_possible_source_locations 500 \
     --num_measurement_locations 100 \
-    --tmp_folder /tmp \
     --seed 1
 
 julia --project generate-heat-source-location.jl \
@@ -24,7 +23,6 @@ julia --project generate-heat-source-location.jl \
     --num_source_locations 10 \
     --num_possible_source_locations 500 \
     --num_measurement_locations 50 \
-    --tmp_folder /tmp \
     --seed 2
 
 # Note: we calculate epsilon = 1/sqrt(num_treatment_samples) = 0.00141
