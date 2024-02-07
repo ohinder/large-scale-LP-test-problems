@@ -57,7 +57,7 @@ function build_multicommodity_flow_problem(
         end
     end
 
-    model = Model(HiGHS.Optimizer);
+    model = direct_model(HiGHS.Optimizer())
     @variable(model, flow_from_factories_to_warehouses[k=1:num_commodities,f=1:num_factories_per_commodity,w=1:num_warehouses] >= 0.0);
     @variable(model, flow_from_warehouses_to_stores[k=1:num_commodities,w=1:num_warehouses,s=1:num_stores] >= 0.0);
     @variable(model, warehouse_overtime_amount[j=1:num_warehouses] >= 0.0);
@@ -265,7 +265,9 @@ function main()
         parsed_args["optimize_model"]
     )
 
-    write_to_file(model, parsed_args["output_file"])
+    if !parsed_args["optimize_model"]
+        HiGHS.Highs_writeModel(JuMP.backend(model), parsed_args["output_file"])
+    end
 end
 
 main()

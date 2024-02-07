@@ -49,7 +49,7 @@ function build_synthetic_design_matching_problem(
         (i,j) = edges[col]
         c[col] = norm(A[i,:] - B[j,:])
     end
-    model = Model(HiGHS.Optimizer)
+    model = direct_model(HiGHS.Optimizer())
     @variable(model, 0 <= x[col=1:length(edges)] <= 1.0);
     @variable(model, 0 <= w[j=1:m] <= 1.0);
 
@@ -146,7 +146,7 @@ function main()
         parsed_args["optimize_model"]
     )
 
-    write_to_file(model, parsed_args["output_file"])
+    HiGHS.Highs_writeModel(JuMP.backend(model), parsed_args["output_file"])
 end
 
 main()

@@ -84,7 +84,7 @@ function CreateProblemInstance(E,T,Dmin,Dmax,α,p,Q,Vmin,Vmax,v1,optimize_model)
     # Set up optimization problem
     ###########################################################################
 
-    model = JuMP.Model(HiGHS.Optimizer)
+    model = direct_model(HiGHS.Optimizer())
 
     # Decision variables for linear decision rule
     @variable(model, y[1:T,1:T,1:E])
@@ -200,7 +200,7 @@ function main()
     model = CreateProblemInstance(E,T,Dmin,Dmax,α,p,Q,Vmin,Vmax,v1,optimize_model)
 
     # Write as a mps file
-    write_to_file(model, parsed_args["output_file"])
+    HiGHS.Highs_writeModel(JuMP.backend(model), parsed_args["output_file"])
 
 end
 

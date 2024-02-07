@@ -3,6 +3,7 @@
 using Random
 using ArgParse
 import HDF5
+import HiGHS
 using LinearAlgebra
 using JuMP, SCS
 using SparseArrays, IterativeSolvers
@@ -131,7 +132,7 @@ function build_heat_source_detection_problem(
     println("building model ...")
 
     begin
-        model = Model()
+        model = direct_model(HiGHS.Optimizer())
         @variable(model, u[i=0:(grid_size+1), j=0:(grid_size+1), k=0:(grid_size+1)])
         @variable(model, 0.0 <= q[i=1:grid_size, j=1:grid_size, k=1:grid_size] <= 0.0)
 
@@ -226,7 +227,8 @@ function main()
         rm(parsed_args["ground_truth_file"])
     end
     HDF5.h5write(parsed_args["ground_truth_file"], "u_true", u_true)
-    write_to_file(model, parsed_args["output_file"])
+    HiGHS.Highs_writeModel(JuMP.backend(model), parsed_args["output_file"])
+    #write_to_file(model, parsed_args["output_file"])
 end
 
 main()

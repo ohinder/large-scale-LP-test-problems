@@ -1,14 +1,14 @@
 mkdir -p small-problem-instances
 
 julia --project generate-multicommodity-flow.jl \
-  --output_file small-problem-instances/multicommodity-flow-instance.mps.gz \
+  --output_file small-problem-instances/multicommodity-flow-instance.mps \
   --num_commodities 100 \
   --num_warehouses 30 \
   --num_stores 100 \
   --seed 1
 
 julia --project generate-heat-source-location.jl \
-  --output_file small-problem-instances/heat-source-instance1.mps.gz \
+  --output_file small-problem-instances/heat-source-instance1.mps \
   --ground_truth_file small-problem-instances/temperature_ground_truth1.txt \
   --grid_size 50 \
   --num_source_locations 3 \
@@ -17,7 +17,7 @@ julia --project generate-heat-source-location.jl \
   --num_measurement_locations 80
 
 julia --project generate-heat-source-location.jl \
-  --output_file small-problem-instances/heat-source-instance2.mps.gz \
+  --output_file small-problem-instances/heat-source-instance2.mps \
   --ground_truth_file small-problem-instances/temperature_ground_truth2.txt \
   --grid_size 50 \
   --num_source_locations 3 \
@@ -27,7 +27,7 @@ julia --project generate-heat-source-location.jl \
 
 # Note: we calculate epsilon = 1/sqrt(num_treatment_samples) = 0.0141
 julia --project design-matching-synthetic.jl \
-    --output_file small-problem-instances/synthetic-design-match.mps.gz \
+    --output_file small-problem-instances/synthetic-design-match.mps \
     --epsilon 0.0141 \
     --num_treatment_samples 5000 \
     --num_control_samples 20000 \
@@ -37,7 +37,7 @@ julia --project design-matching-synthetic.jl \
     --seed 1
 
 julia --project generate-production-inventory.jl \
-    --output_file small-problem-instances/production-inventory.mps.gz \
+    --output_file small-problem-instances/production-inventory.mps \
     --num_factories 10 \
     --num_stages 20 \
     --uncertainty_level 0.2
