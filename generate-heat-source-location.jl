@@ -1,5 +1,5 @@
 # https://en.wikipedia.org/wiki/Heat_equation
-# **at equilbrium**
+# **at equilibrium**
 using Random
 using Dates
 using ArgParse
@@ -166,8 +166,8 @@ function build_heat_source_detection_problem(
             model = Model()
         end
 	start_time = now()
-        @variable(model, u[i=1:(grid_size+2), j=1:(grid_size+2), k=1:(grid_size+2)])
-        @variable(model, 0.0 <= q[i=1:grid_size, j=1:grid_size, k=1:grid_size] <= 0.0)
+        @variable(model, u[i=1:(grid_size+2), j=1:(grid_size+2), k=1:(grid_size+2)], set_string_name = false)
+        @variable(model, 0.0 <= q[i=1:grid_size, j=1:grid_size, k=1:grid_size] <= 0.0, set_string_name = false)
 	println("Create variables: ", now() - start_time)
 	flush(stdout)
 
@@ -306,7 +306,7 @@ function main()
 
     println("writing model to file ...")
     flush(stdout)
-    @time "Write model" write_to_file(model, parsed_args["output_file"])
+    @time "Write model" write_to_file(model, parsed_args["output_file"], generic_names = true)
     flush(stdout)
 end
 

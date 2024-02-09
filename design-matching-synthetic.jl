@@ -57,8 +57,8 @@ function build_synthetic_design_matching_problem(
     
     model = Model(HiGHS.Optimizer)
     start_time = now()
-    @variable(model, 0 <= x[col=1:length(edges)] <= 1.0);
-    @variable(model, 0 <= w[j=1:m] <= 1.0);
+    @variable(model, 0 <= x[col=1:length(edges)] <= 1.0, set_string_name = false);
+    @variable(model, 0 <= w[j=1:m] <= 1.0, set_string_name = false);
     println("Create variables: ", now() - start_time)
     flush(stdout)
 
@@ -176,7 +176,7 @@ function main()
 
     println("writing model to file ...")
     flush(stdout)
-    @time "Write model" write_to_file(model, parsed_args["output_file"])
+    @time "Write model" write_to_file(model, parsed_args["output_file"], generic_names = true)
     flush(stdout)
 end
 
