@@ -2,7 +2,7 @@ mkdir -p large-problem-instances
 
 julia --project generate-multicommodity-flow.jl \
     --output_file large-problem-instances/multicommodity-flow-instance.mps.gz \
-    --num_commodities 20000 \
+    --num_commodities 10000 \
     --num_warehouses 100 \
     --num_stores 1000 \
     --seed 1
