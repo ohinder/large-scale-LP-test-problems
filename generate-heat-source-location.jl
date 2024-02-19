@@ -1,6 +1,7 @@
 # https://en.wikipedia.org/wiki/Heat_equation
 # **at equilbrium**
 using Random
+using Dates
 using ArgParse
 import HDF5
 using LinearAlgebra
@@ -11,6 +12,7 @@ using HiGHS
 include("utils.jl")
 
 function solve_pde_linear_system(N::Int64, data::JuMP.LPMatrixData, pde_solve_tolerance::Float64)
+    start_time = now()
     uvars = data.x_upper
     lvars = data.x_lower
     rhs = data.b_lower
@@ -32,8 +34,13 @@ function solve_pde_linear_system(N::Int64, data::JuMP.LPMatrixData, pde_solve_to
     end
     rhs = Vector(rhs)
     A = A[:,keep_indicies]
+    println("Generate ground truth system: ", now() - start_time)
+    flush(stdout)
 
+    start_time = now()
     u_tmp = minres(A, rhs, abstol=0.0, reltol = 1e-2 * pde_solve_tolerance)
+    println("Solve ground truth system: ", now() - start_time)
+    flush(stdout)
 
     if norm(A * u_tmp - rhs) > pde_solve_tolerance * norm(rhs)
         println("warning, didn't solve to desired accuracy:")
@@ -55,7 +62,7 @@ function solve_pde_linear_system(N::Int64, data::JuMP.LPMatrixData, pde_solve_to
     return u_true
 end
 
-function build_discretized_possion!(model, u, q, N::Int64)
+function build_discretized_poisson!(model, u, q, N::Int64)
     h = 1.0 / N
     @expression(model, grad_u_xx[i=2:(N+1), j=2:(N+1), k=2:(N+1)], (u[i+1, j, k] - 2 * u[i, j, k] + u[i-1, j, k]) / h^2)
     @expression(model, grad_u_yy[i=2:(N+1), j=2:(N+1), k=2:(N+1)], (u[i, j+1, k] - 2 * u[i, j, k] + u[i, j-1, k]) / h^2)
@@ -99,6 +106,7 @@ function build_heat_source_detection_problem(
     @assert num_measurement_locations > num_source_locations
     # https://en.wikipedia.org/wiki/Inverse_problem
 
+    start_time = now()
     heat_source_locations = rand(3, num_source_locations)
     heat_source_location_indexes = Int.(round.((grid_size - 1) * heat_source_locations)) .+ 2
     heat_flow_rate = rand(num_source_locations)
@@ -108,22 +116,29 @@ function build_heat_source_detection_problem(
         location_indicies = heat_source_location_indexes[:, location] .- 1
         q[location_indicies...] += grid_size^3 * heat_flow_rate[location]
     end
-
+    println("Generate instance data: ", now() - start_time)
+    flush(stdout)
+    
     ##################
     # Compute u_true #
     ##################
 
     println("computing u_true")
+    flush(stdout)
 
+    start_time = now()
     pde_model = Model()
     @variable(pde_model, u[i=1:(grid_size+2), j=1:(grid_size+2), k=1:(grid_size+2)])
-    build_discretized_possion!(pde_model, u, q, grid_size)
+    build_discretized_poisson!(pde_model, u, q, grid_size)
     u_true = solve_pde_linear_system(grid_size, lp_matrix_data(pde_model), pde_tolerance)
 
-    println("computed u_true")
+    println("computed u_true: ", now() - start_time)
+    flush(stdout)
     @show norm(u_true, 1)
 
     println("building inverse problem ...")
+    flush(stdout)
+    start_time = now()
     measurement_locations = rand(3, num_measurement_locations)
     measurement_location_indexes = Int.(round.((grid_size - 1) * measurement_locations)) .+ 2
     @assert minimum(measurement_location_indexes) >= 2
@@ -133,27 +148,39 @@ function build_heat_source_detection_problem(
     candidate_location_indexes = Int.(round.((grid_size - 1) * candidate_locations)) .+ 2
     @assert maximum(candidate_location_indexes) <= grid_size + 1
     @assert minimum(candidate_location_indexes) >= 2
-    
+    println("Built inverse problem data: ", now() - start_time)
+    flush(stdout)
 
 
     ############################
     # Build optimization model #
     ############################
     println("building model ...")
+    flush(stdout)
 
     begin
+        model_start_time = now()
         if optimize_model
             model = Model(HiGHS.Optimizer)
         else 
             model = Model()
         end
+	start_time = now()
         @variable(model, u[i=1:(grid_size+2), j=1:(grid_size+2), k=1:(grid_size+2)])
         @variable(model, 0.0 <= q[i=1:grid_size, j=1:grid_size, k=1:grid_size] <= 0.0)
+	println("Create variables: ", now() - start_time)
+	flush(stdout)
 
+        start_time = now()
         @objective(model, Min, sum(q))
+	println("Set objective: ", now() - start_time)
+	flush(stdout)
 
+	start_time = now()
         # second-order central difference
-        build_discretized_possion!(model, u, q, grid_size)
+        build_discretized_poisson!(model, u, q, grid_size)
+	println("Create discretized poisson constraints: ", now() - start_time)
+	flush(stdout)
 
         # q is unknown at possible heat source locations
         for location = axes(heat_source_location_indexes, 2)
@@ -181,7 +208,8 @@ function build_heat_source_detection_problem(
             JuMP.set_lower_bound(u[location_indicies...], minimum_u_value)
             JuMP.set_upper_bound(u[location_indicies...], maximum_u_value)
         end
-        println("built inverse problem")
+        println("built inverse problem: ", now() - model_start_time)
+	flush(stdout)
     end
 
     if optimize_model
@@ -252,7 +280,7 @@ function main()
 
     Random.seed!(parsed_args["seed"])
 
-    model, u_true = build_heat_source_detection_problem(
+    @time "Build model" model, u_true = build_heat_source_detection_problem(
         parsed_args["num_source_locations"],
         parsed_args["num_possible_source_locations"],
         parsed_args["num_measurement_locations"],
@@ -261,20 +289,21 @@ function main()
         parsed_args["optimize_model"],
         parsed_args["pde_solve_tolerance"]
     )
+    flush(stdout)
 
     if isfile(parsed_args["ground_truth_file"])
         rm(parsed_args["ground_truth_file"])
     end
-    println("writting ground truth to file ...")
-    HDF5.h5write(parsed_args["ground_truth_file"], "u_true", u_true)
+    @time "Write ground truth" HDF5.h5write(parsed_args["ground_truth_file"], "u_true", u_true)
+    flush(stdout)
 
     if parsed_args["rescale_model"]
         println("rescaling model ...")
         model = rescale_instance(lp_matrix_data(model))
     end
 
-    println("writting model to file ...")
-    write_to_file(model, parsed_args["output_file"])
+    @time "Write model" write_to_file(model, parsed_args["output_file"])
+    flush(stdout)
 end
 
 main()

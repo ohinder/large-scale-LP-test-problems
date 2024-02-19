@@ -1,7 +1,7 @@
 using Distances
 import HiGHS
 using LinearAlgebra
-using Random
+using Dates
 using SparseArrays
 using ArgParse
 using JuMP
@@ -32,7 +32,6 @@ Logging.disable_logging(Logging.Warn)
 # v1    -- Initial inventory
 
 function CreateProblemInstance(E,T,Dmin,Dmax,α,p,Q,Vmin,Vmax,v1,optimize_model)
-
 
     ###########################################################################
     # Specify the dimensions of the multi-stage robust linear optimization
@@ -81,41 +80,55 @@ function CreateProblemInstance(E,T,Dmin,Dmax,α,p,Q,Vmin,Vmax,v1,optimize_model)
         push!(Dmax, Dmax_old[t])
     end
 
-
     ###########################################################################
     # Set up optimization problem
     ###########################################################################
 
     model = JuMP.Model(HiGHS.Optimizer)
 
+    start_time = now()
     # Decision variables for linear decision rule
     @variable(model, y[1:T,1:T,1:E])
+    println("Create decision variables: ", now() - start_time)
+    flush(stdout)
 
     # Objective
+    start_time = now()
     @variable(model, ε_pos[1:T] ≥ 0)
     @variable(model, ε_neg[1:T] ≥ 0)
     @constraint(model, Obj_Eq[s=1:T], ε_pos[s] - ε_neg[s]  == sum(sum(α[t][e]*y[t,s,e] for t=s:T) for e=1:E))
     @objective(model, Min, sum(Dmax[s]*ε_pos[s] - Dmin[s]*ε_neg[s] for s=1:T))
+    println("Create objective: ", now() - start_time)
+    flush(stdout)
 
+    start_time = now()
     # Capacity constriants
     @variable(model, γ_pos[t=1:T,s=1:t,e=1:E] ≥ 0)
     @variable(model, γ_neg[t=1:T,s=1:t,e=1:E] ≥ 0)
     @constraint(model, Cap_Eq[t=1:T,s=1:t,e=1:E], y[t,s,e] == γ_pos[t,s,e] - γ_neg[t,s,e])
     @constraint(model, Cap_UB[t=1:T,e=1:E], sum(Dmax[s]*γ_pos[t,s,e] - Dmin[s]*γ_neg[t,s,e] for s=1:t) ≤ p[t][e])
     @constraint(model, Cap_LB[t=1:T,e=1:E], sum(-Dmin[s]*γ_pos[t,s,e] + Dmax[s]*γ_neg[t,s,e] for s=1:t) ≤ 0)
+    println("Create capacity constraints: ", now() - start_time)
+    flush(stdout)
 
+    start_time = now()
     # Per-factory capacity constraints
     @variable(model, δ_pos[s=1:T,e=1:E] ≥ 0)
     @variable(model, δ_neg[s=1:T,e=1:E] ≥ 0)
     @constraint(model, Fac_Eq[s=1:T,e=1:E], sum(y[t,s,e] for t=s:T) == δ_pos[s,e] - δ_neg[s,e])
     @constraint(model, Fac_UB[e=1:E], sum(Dmax[s]*δ_pos[s,e] - Dmin[s]*δ_neg[s,e] for s=1:T) ≤ Q[e])
+    println("Create per-factory constraints: ", now() - start_time)
+    flush(stdout)
 
+    start_time = now()
     # Total constraints
     @variable(model, η_pos[t=1:T,s=1:T] ≥ 0)
     @variable(model, η_neg[t=1:T,s=1:T] ≥ 0)
     @constraint(model, Tot_Eq[s=2:T,t=s:T], -1 + sum(sum( y[ℓ,s,e] for e=1:E) for ℓ=s:t) == η_pos[t,s] - η_neg[t,s])
     @constraint(model, Tot_UB[t=1:T],  v1 + sum(sum(y[s,1,e] for e=1:E) for s=1:t) + sum( Dmax[s]*η_pos[t,s] - Dmin[s]*η_neg[t,s] for s=2:t) - Dmin[t+1] ≤ Vmax)
     @constraint(model, Tot_LB[t=1:T], -v1 - sum(sum(y[s,1,e] for e=1:E) for s=1:t) + sum(-Dmin[s]*η_pos[t,s] + Dmax[s]*η_neg[t,s] for s=2:t) + Dmax[t+1] ≤ - Vmin)
+    println("Create total constraints: ", now() - start_time)
+    flush(stdout)
 
     if optimize_model
         optimize!(model)
@@ -196,14 +209,18 @@ function main()
         println("  $arg  =>  $val")
     end
     println("building model ...")
+    flush(stdout)
+
     E = parsed_args["num_factories"]
     T = parsed_args["num_stages"]
     θ = parsed_args["uncertainty_level"]
     optimize_model = parsed_args["optimize_model"]
 
     # Create problem instance
-    Dmin, Dmax, α, p, Q, Vmin, Vmax, v1 = CreateProblemInstanceParameters(T,E,θ)
-    model = CreateProblemInstance(E,T,Dmin,Dmax,α,p,Q,Vmin,Vmax,v1,optimize_model)
+    @time "Create instance parameters" Dmin, Dmax, α, p, Q, Vmin, Vmax, v1 = CreateProblemInstanceParameters(T,E,θ)
+    flush(stdout)
+    @time "Create model" model = CreateProblemInstance(E,T,Dmin,Dmax,α,p,Q,Vmin,Vmax,v1,optimize_model)
+    flush(stdout)
 
     if parsed_args["rescale_model"]
         println("rescaling model ...")
@@ -211,10 +228,8 @@ function main()
     end
 
     # Write as a mps file
-    println("writting model to file ...")
-    write_to_file(model, parsed_args["output_file"])
+    @time "Write model" write_to_file(model, parsed_args["output_file"])
 
 end
 
 main()
-

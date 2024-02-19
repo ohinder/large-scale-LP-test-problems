@@ -59,7 +59,7 @@ function build_multicommodity_flow_problem(
             shipping_cost_from_warehouses_to_stores[w,s] = norm(store_locations[s,:] - warehouse_locations[w,:])
         end
     end
-    println("Set problem data: ", now() - start_time)
+    println("Generate instance data: ", now() - start_time)
     flush(stdout)
 
     model = Model(HiGHS.Optimizer)
@@ -271,7 +271,7 @@ function main()
     if isdir(parsed_args["folder_for_plots"])
         throw(error("Folder $(parsed_args["folder_for_plots"]) already exists. Please choose a folder location that does not already exist."))
     end
-    model = build_multicommodity_flow_problem(
+    @time "Build model" model = build_multicommodity_flow_problem(
         parsed_args["num_factories_per_commodity"],
         parsed_args["num_commodities"],
         parsed_args["num_warehouses"],
@@ -280,17 +280,14 @@ function main()
         parsed_args["folder_for_plots"],
         parsed_args["optimize_model"]
     )
+    flush(stdout)
 
     if parsed_args["rescale_model"]
         println("rescaling model ...")
         model = rescale_instance(lp_matrix_data(model))
     end
 
-    start_time = now()
-    println(start_time, " writing model")
-    flush(stdout);
-    write_to_file(model, parsed_args["output_file"])
-    println("Write model: ", now() - start_time)
+    @time "Write model" write_to_file(model, parsed_args["output_file"])
     flush(stdout)
 end
 
