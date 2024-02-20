@@ -123,7 +123,7 @@ function build_heat_source_detection_problem(
 
     start_time = now()
     pde_model = Model()
-    @variable(pde_model, u[i=1:(grid_size+2), j=1:(grid_size+2), k=1:(grid_size+2)])
+    @variable(pde_model, u[i=1:(grid_size+2), j=1:(grid_size+2), k=1:(grid_size+2)], set_string_name = false)
     build_discretized_poisson!(pde_model, u, q, grid_size)
     u_true = solve_pde_linear_system(grid_size, lp_matrix_data(pde_model), pde_tolerance, u)
 
