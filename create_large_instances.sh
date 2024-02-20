@@ -9,7 +9,7 @@ julia --project generate-multicommodity-flow.jl \
 
 julia --project generate-heat-source-location.jl \
     --output_file large-problem-instances/heat-source-instance1.mps.gz \
-    --ground_truth_file large-problem-instances/temperature_ground_truth1.txt \
+    --ground_truth_file large-problem-instances/temperature_ground_truth1.hdf5 \
     --grid_size 400 \
     --num_source_locations 10 \
     --num_possible_source_locations 500 \
@@ -18,7 +18,7 @@ julia --project generate-heat-source-location.jl \
 
 julia --project generate-heat-source-location.jl \
     --output_file large-problem-instances/heat-source-instance2.mps.gz \
-    --ground_truth_file large-problem-instances/temperature_ground_truth2.txt \
+    --ground_truth_file large-problem-instances/temperature_ground_truth2.hdf5 \
     --grid_size 400 \
     --num_source_locations 10 \
     --num_possible_source_locations 500 \
