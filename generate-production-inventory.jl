@@ -219,7 +219,7 @@ function main()
     # Create problem instance
     @time "Create instance parameters" Dmin, Dmax, α, p, Q, Vmin, Vmax, v1 = CreateProblemInstanceParameters(T,E,θ)
     flush(stdout)
-    @time "Create model" model = CreateProblemInstance(E,T,Dmin,Dmax,α,p,Q,Vmin,Vmax,v1,optimize_model)
+    @time "Build model" model = CreateProblemInstance(E,T,Dmin,Dmax,α,p,Q,Vmin,Vmax,v1,optimize_model)
     flush(stdout)
 
     if parsed_args["rescale_model"]
