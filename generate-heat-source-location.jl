@@ -11,23 +11,25 @@ using Base
 using HiGHS
 include("utils.jl")
 
-function solve_pde_linear_system(N::Int64, data::JuMP.LPMatrixData, pde_solve_tolerance::Float64)
+function solve_pde_linear_system(N::Int64, data::JuMP.LPMatrixData, pde_solve_tolerance::Float64, u)
     start_time = now()
     uvars = data.x_upper
     lvars = data.x_lower
     rhs = data.b_lower
     A = data.A
-    varnames = [name(x) for x in data.variables]
 
-    u_true_dict = Dict()
+    u_true = zeros(N+2, N+2, N+2);
     keep_indicies = Vector{Int64}()
-    for i in eachindex(lvars)
+    keep_points = Vector{CartesianIndex}()
+    for p in CartesianIndices(u)
+        i = u[p].index.value
         lvar = lvars[i]
         if lvar == uvars[i]
             rhs -= A[:,i] * lvars[i]
-            u_true_dict[varnames[i]] = lvar
+            u_true[p] = lvar
         elseif lvar == -Inf && uvars[i] == Inf
             push!(keep_indicies, i)
+	    push!(keep_points, p)
         else
             error("Something was wrong with the model")
         end
@@ -47,16 +49,8 @@ function solve_pde_linear_system(N::Int64, data::JuMP.LPMatrixData, pde_solve_to
         @show norm(A * u_tmp - rhs) / norm(rhs)
     end
 
-    for i in 1:length(keep_indicies)
-        u_name = varnames[keep_indicies[i]]
-        u_true_dict[u_name] = u_tmp[i]
-    end
-
-
-    u_true = zeros(N+2, N+2, N+2);
-    for (key,value) in u_true_dict
-       indicies = parse.(Int, split(key[3:end-1],","))
-       u_true[indicies...] = value 
+    for i in 1:length(keep_points)
+	u_true[keep_points[i]] = u_tmp[i]
     end
 
     return u_true
@@ -131,7 +125,7 @@ function build_heat_source_detection_problem(
     pde_model = Model()
     @variable(pde_model, u[i=1:(grid_size+2), j=1:(grid_size+2), k=1:(grid_size+2)])
     build_discretized_poisson!(pde_model, u, q, grid_size)
-    u_true = solve_pde_linear_system(grid_size, lp_matrix_data(pde_model), pde_tolerance)
+    u_true = solve_pde_linear_system(grid_size, lp_matrix_data(pde_model), pde_tolerance, u)
 
     println("computed u_true: ", now() - start_time)
     flush(stdout)
