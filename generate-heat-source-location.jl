@@ -67,7 +67,8 @@ function build_discretized_poisson!(model, u, q, N::Int64)
     @expression(model, grad_u_xx[i=2:(N+1), j=2:(N+1), k=2:(N+1)], (u[i+1, j, k] - 2 * u[i, j, k] + u[i-1, j, k]) / h^2)
     @expression(model, grad_u_yy[i=2:(N+1), j=2:(N+1), k=2:(N+1)], (u[i, j+1, k] - 2 * u[i, j, k] + u[i, j-1, k]) / h^2)
     @expression(model, grad_u_zz[i=2:(N+1), j=2:(N+1), k=2:(N+1)], (u[i, j, k+1] - 2 * u[i, j, k] + u[i, j, k-1]) / h^2)
-    @constraint(model, grad_u_xx + grad_u_yy + grad_u_zz .== -q)
+    @constraint(model, grad_u_xx + grad_u_yy + grad_u_zz .== -q,
+	        set_string_name = false)
 
     # boundary conditions
     for j = 1:(N+2)

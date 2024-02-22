@@ -77,19 +77,19 @@ function build_synthetic_design_matching_problem(
     end
 
     # Matching constraints
-    @constraint(model, treatment_assignment_matrix * x .== 1.0);
-    @constraint(model, control_assignment_matrix * x .== w);
+    @constraint(model, treatment_assignment_matrix * x .== 1.0, set_string_name = false);
+    @constraint(model, control_assignment_matrix * x .== w, set_string_name = false);
 
     # First moments are similar to treatment
     expected_first_moment = A' * ones(n) / n
     @expression(model, first_moment_residual, B' * w / n - expected_first_moment);
-    @constraint(model, -epsilon .<= first_moment_residual .<= epsilon);
+    @constraint(model, -epsilon .<= first_moment_residual .<= epsilon, set_string_name = false);
 
     # Second moments are similar to treatment
     for k = 1:d
         for l = k:d
             M_kl = sum(A[i,k] * A[i,l] for i = 1:n) / n
-            @constraint(model, -epsilon <= sum(B[j,k] * B[j,l] * w[j] for j = 1:m) / n - M_kl <= epsilon)
+            @constraint(model, -epsilon <= sum(B[j,k] * B[j,l] * w[j] for j = 1:m) / n - M_kl <= epsilon, set_string_name = false)
         end
     end
     println("Create constraints: ", now() - start_time)

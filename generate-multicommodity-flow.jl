@@ -87,7 +87,8 @@ function build_multicommodity_flow_problem(
     for k in 1:num_commodities
         for f in 1:num_factories_per_commodity
             @constraint(model, sum(flow_from_factories_to_warehouses[k,f,w] 
-                for w in 1:num_warehouses) <= supply_per_factory[k])
+                for w in 1:num_warehouses) <= supply_per_factory[k],
+		set_string_name = false)
         end
     end
 
@@ -97,7 +98,7 @@ function build_multicommodity_flow_problem(
 
     # overtime constraint
     for w in 1:num_warehouses
-        @constraint(model, total_flow_into_warehouses[w] <= warehouse_normal_capacity + warehouse_overtime_amount[w])
+        @constraint(model, total_flow_into_warehouses[w] <= warehouse_normal_capacity + warehouse_overtime_amount[w], set_string_name = false)
     end
 
     # flow into warehouses equals flow out of warehouses
@@ -107,8 +108,8 @@ function build_multicommodity_flow_problem(
             sum(flow_from_factories_to_warehouses[k,f,w] 
                 for f=1:num_factories_per_commodity) ==
                 sum(flow_from_warehouses_to_stores[k,w,s] 
-                    for s in 1:num_stores)
-            )
+                    for s in 1:num_stores),
+            set_string_name = false)
         end
     end
 
@@ -117,7 +118,8 @@ function build_multicommodity_flow_problem(
         for s=1:num_stores
             @constraint(model, 
                 sum(flow_from_warehouses_to_stores[k,w,s] for w = 1:num_warehouses) ==
-                    demand_per_commodity_store[k,s]
+                    demand_per_commodity_store[k,s],
+		set_string_name = false
             )
         end
     end
