@@ -157,11 +157,15 @@ function build_heat_source_detection_problem(
         # q is unknown at possible heat source locations
         for location = axes(heat_source_location_indexes, 2)
             location_indicies = heat_source_location_indexes[:, location] .- 1
-            JuMP.delete_upper_bound(q[location_indicies...])
+            if has_upper_bound(q[location_indicies...])
+                JuMP.delete_upper_bound(q[location_indicies...])
+            end
         end
         for location = axes(candidate_location_indexes, 2)
             location_indicies = candidate_location_indexes[:, location] .- 1
-            JuMP.delete_upper_bound(q[location_indicies...])
+            if has_upper_bound(q[location_indicies...])
+                JuMP.delete_upper_bound(q[location_indicies...])
+            end
         end
 
         # u is known at the measurement locations
