@@ -5,6 +5,7 @@ using LinearAlgebra
 using SparseArrays
 using ArgParse
 using NearestNeighbors
+include("utils.jl")
 
 # aim for problems with > 100 million nonzeros
 # create a suite a smaller test problems with ~1 million nonzeros
@@ -121,6 +122,10 @@ function parse_commandline()
         "--output_file"
             help = "This is the location that the mps file will be written to."
             required = true
+        "--rescale_model"
+            help = RESCALE_MODEL_HELP_DESCRIPTION # this is defined in utils.jl
+            arg_type = Bool
+            default = true
     end
 
     return parse_args(s)

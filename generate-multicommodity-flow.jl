@@ -6,6 +6,7 @@ using SparseArrays
 using Distributions
 using Plots
 using ArgParse
+include("utils.jl")
 
 function build_multicommodity_flow_problem(
     num_factories_per_commodity::Int64,
@@ -237,6 +238,10 @@ function parse_commandline()
         "--output_file"
             help = "This is the location that the mps file will be written to."
             required = true
+        "--rescale_model"
+            help = RESCALE_MODEL_HELP_DESCRIPTION # this is defined in utils.jl
+            arg_type = Bool
+            default = true
     end
 
     return parse_args(s)
@@ -265,6 +270,12 @@ function main()
         parsed_args["optimize_model"]
     )
 
+    if parsed_args["rescale_model"]
+        println("rescaling model ...")
+        model = rescale_instance(lp_matrix_data(model))
+    end
+
+    println("writting model to file ...")
     write_to_file(model, parsed_args["output_file"])
 end
 

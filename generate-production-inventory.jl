@@ -6,6 +6,8 @@ using SparseArrays
 using ArgParse
 using JuMP
 import Logging
+include("utils.jl")
+
 Logging.disable_logging(Logging.Warn)
 # using Gurobi
 # ENV["GRB_LICENSE_FILE"] = "/Users/haihaolu/gurobi.lic"
@@ -176,6 +178,10 @@ function parse_commandline()
             help = "If this flag is set then the model will be optimized with HiGHS. 
             Only use this option is the model is small enough for HiGHS to optimize."
             action = :store_true
+        "--rescale_model"
+            help = RESCALE_MODEL_HELP_DESCRIPTION # this is defined in utils.jl
+            arg_type = Bool
+            default = true
     end
 
     return parse_args(s)
@@ -199,7 +205,13 @@ function main()
     Dmin, Dmax, α, p, Q, Vmin, Vmax, v1 = CreateProblemInstanceParameters(T,E,θ)
     model = CreateProblemInstance(E,T,Dmin,Dmax,α,p,Q,Vmin,Vmax,v1,optimize_model)
 
+    if parsed_args["rescale_model"]
+        println("rescaling model ...")
+        model = rescale_instance(lp_matrix_data(model))
+    end
+
     # Write as a mps file
+    println("writting model to file ...")
     write_to_file(model, parsed_args["output_file"])
 
 end

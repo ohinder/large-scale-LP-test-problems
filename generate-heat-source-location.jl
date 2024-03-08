@@ -8,6 +8,7 @@ using JuMP
 using SparseArrays, IterativeSolvers
 using Base
 using Gurobi
+include("utils.jl")
 
 function solve_pde_linear_system(N::Int64, data::JuMP.LPMatrixData, pde_solve_tolerance::Float64)
     uvars = data.x_upper
@@ -233,6 +234,10 @@ function parse_commandline()
         "--output_file"
         help = "This is the location that the mps file will be written to."
         required = true
+        "--rescale_model"
+        help = RESCALE_MODEL_HELP_DESCRIPTION # this is defined in utils.jl
+        arg_type = Bool
+        default = true
     end
 
     return parse_args(s)
@@ -262,6 +267,11 @@ function main()
     end
     println("writting ground truth to file ...")
     HDF5.h5write(parsed_args["ground_truth_file"], "u_true", u_true)
+
+    if parsed_args["rescale_model"]
+        println("rescaling model ...")
+        model = rescale_instance(lp_matrix_data(model))
+    end
 
     println("writting model to file ...")
     write_to_file(model, parsed_args["output_file"])
