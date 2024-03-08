@@ -99,7 +99,7 @@ function build_heat_source_detection_problem(
     # https://en.wikipedia.org/wiki/Inverse_problem
 
     heat_source_locations = rand(3, num_source_locations)
-    heat_source_location_indexes = Int.(round.((grid_size - 1) * heat_source_locations)) .+ 1
+    heat_source_location_indexes = Int.(round.((grid_size - 1) * heat_source_locations)) .+ 2
     heat_flow_rate = rand(num_source_locations)
 
     q = zeros(grid_size, grid_size, grid_size)
