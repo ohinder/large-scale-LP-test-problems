@@ -7,7 +7,7 @@ using LinearAlgebra
 using JuMP
 using SparseArrays, IterativeSolvers
 using Base
-using Gurobi
+using HiGHS
 include("utils.jl")
 
 function solve_pde_linear_system(N::Int64, data::JuMP.LPMatrixData, pde_solve_tolerance::Float64)
@@ -143,7 +143,7 @@ function build_heat_source_detection_problem(
 
     begin
         if optimize_model
-            model = Model(Gurobi.Optimizer)
+            model = Model(HiGHS.Optimizer)
         else 
             model = Model()
         end
