@@ -33,7 +33,7 @@ function rescale_instance(data::JuMP.LPMatrixData)
     x_upper = data.x_upper ./ rescaling_obj
     c = data.c .* rescaling_obj
 
-    A = Diagonal(rescaling_rhs) * data.A * Diagonal(rescaling_obj)
+    A = (Diagonal(rescaling_rhs) * data.A) * Diagonal(rescaling_obj)
 
     # build jump model with rescaled data
     rescaled_model = Model()
