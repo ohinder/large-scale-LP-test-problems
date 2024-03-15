@@ -1,4 +1,4 @@
-using JuMP
+using JuMP, LinearAlgebra
 # Returns a new rescaled jump model.
 #  If this is true we rescale the model. This rescaling makes 
 # the objective coefficients all 0, 1 or -1. The rescaling makes all the right hand 
@@ -17,9 +17,6 @@ function rescale_instance(data::JuMP.LPMatrixData)
             rescaling_rhs[i] = 1.0 / max(abs(data.b_lower[i]), abs(data.b_upper[i]))
         end
     end
-    b_lower = data.b_lower .* rescaling_rhs
-    b_upper = data.b_upper .* rescaling_rhs
-    A = data.A .* rescaling_rhs
 
     rescaling_obj = ones(length(data.c))
     for i = 1:length(data.c)
@@ -27,18 +24,22 @@ function rescale_instance(data::JuMP.LPMatrixData)
             rescaling_obj[i] = 1.0 / abs(data.c[i])
         end
     end
+
+    # perform rescaling on data
+    b_lower = data.b_lower .* rescaling_rhs
+    b_upper = data.b_upper .* rescaling_rhs
+    
     x_lower = data.x_lower ./ rescaling_obj
     x_upper = data.x_upper ./ rescaling_obj
-    for col in axes(A,2)
-        A[:,col] *= rescaling_obj[col]
-    end
     c = data.c .* rescaling_obj
 
+    A = Diagonal(rescaling_rhs) * data.A * Diagonal(rescaling_obj)
+
+    # build jump model with rescaled data
     rescaled_model = Model()
     @variable(rescaled_model, x_lower[i] .<= x[i=1:length(x_lower)] .<= x_upper[i])
     @objective(rescaled_model, data.sense, sum(c[i] * x[i] for i=1:length(x_lower)))
     @constraint(rescaled_model, b_lower .<= A * x .<= b_upper)
-    
     return rescaled_model
 end
 
