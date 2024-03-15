@@ -230,6 +230,8 @@ function main()
     end
 
     # Write as a mps file
+    println("writing model to file ...")
+    flush(stdout)
     @time "Write model" write_to_file(model, parsed_args["output_file"])
 
 end
