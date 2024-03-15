@@ -151,6 +151,11 @@ function main()
         parsed_args["optimize_model"]
     )
 
+    if parsed_args["rescale_model"]
+        println("rescaling model ...")
+        model = rescale_instance(lp_matrix_data(model))
+    end
+
     write_to_file(model, parsed_args["output_file"])
 end
 
