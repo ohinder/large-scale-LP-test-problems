@@ -284,7 +284,9 @@ function main()
 
     if parsed_args["rescale_model"]
         println("rescaling model ...")
-        model = rescale_instance(lp_matrix_data(model))
+	flush(stdout)
+        @time "Rescale model" model = rescale_instance(lp_matrix_data(model))
+	flush(stdout)
     end
 
     @time "Write model" write_to_file(model, parsed_args["output_file"])
