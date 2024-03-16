@@ -1,6 +1,7 @@
 using JuMP
 import HiGHS
 using Random
+using Dates
 using LinearAlgebra
 using SparseArrays
 using ArgParse
@@ -22,6 +23,7 @@ function build_synthetic_design_matching_problem(
     control_shift_magnitude::Float64,
     optimize_model::Bool
 )
+    start_time = now()
     n = num_treatment_samples
     m = num_control_samples
     @assert m > n
@@ -50,12 +52,22 @@ function build_synthetic_design_matching_problem(
         (i,j) = edges[col]
         c[col] = norm(A[i,:] - B[j,:])
     end
+    println("Generate instance data: ", now() - start_time)
+    flush(stdout)
+    
     model = Model(HiGHS.Optimizer)
+    start_time = now()
     @variable(model, 0 <= x[col=1:length(edges)] <= 1.0);
     @variable(model, 0 <= w[j=1:m] <= 1.0);
+    println("Create variables: ", now() - start_time)
+    flush(stdout)
 
+    start_time = now()
     @objective(model, Min, sum(c[col] .* x[col] for col = 1:length(edges)));
+    println("Set objective: ", now() - start_time)
+    flush(stdout)
 
+    start_time = now()
     treatment_assignment_matrix = spzeros(n, length(edges));
     control_assignment_matrix = spzeros(m, length(edges));
     for col in 1:length(edges)
@@ -80,6 +92,8 @@ function build_synthetic_design_matching_problem(
             @constraint(model, -epsilon <= sum(B[j,k] * B[j,l] * w[j] for j = 1:m) / n - M_kl <= epsilon)
         end
     end
+    println("Create constraints: ", now() - start_time)
+    flush(stdout)
 
     if optimize_model
         optimize!(model)
@@ -138,10 +152,11 @@ function main()
         println("  $arg  =>  $val")
     end
     println("building model ...")
+    flush(stdout)
 
     Random.seed!(parsed_args["seed"])
 
-    model = build_synthetic_design_matching_problem(
+    @time "Build model" model = build_synthetic_design_matching_problem(
         parsed_args["epsilon"],
         parsed_args["num_treatment_samples"],
         parsed_args["num_control_samples"],
@@ -150,13 +165,19 @@ function main()
         parsed_args["control_shift_magnitude"],
         parsed_args["optimize_model"]
     )
+    flush(stdout)
 
     if parsed_args["rescale_model"]
         println("rescaling model ...")
-        model = rescale_instance(lp_matrix_data(model))
+	flush(stdout)
+        @time "Rescale model" model = rescale_instance(lp_matrix_data(model))
+	flush(stdout)
     end
 
-    write_to_file(model, parsed_args["output_file"])
+    println("writing model to file ...")
+    flush(stdout)
+    @time "Write model" write_to_file(model, parsed_args["output_file"])
+    flush(stdout)
 end
 
 main()

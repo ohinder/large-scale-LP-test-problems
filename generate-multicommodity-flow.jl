@@ -1,5 +1,6 @@
 using JuMP
 import HiGHS
+using Dates
 using Random
 using LinearAlgebra
 using SparseArrays
@@ -22,7 +23,8 @@ function build_multicommodity_flow_problem(
     @assert num_warehouses >= 1
     @assert num_stores >= 1
     @assert additional_overtime_cost >= 0.0
-    
+
+    start_time = now()
     average_demand_per_commodity = 100.0 * exp.(randn(num_commodities));
     distribution_per_commodity = Poisson.(average_demand_per_commodity);
     demand_per_commodity_store = zeros(num_commodities, num_stores);
@@ -57,12 +59,19 @@ function build_multicommodity_flow_problem(
             shipping_cost_from_warehouses_to_stores[w,s] = norm(store_locations[s,:] - warehouse_locations[w,:])
         end
     end
+    println("Generate instance data: ", now() - start_time)
+    flush(stdout)
 
-    model = Model(HiGHS.Optimizer);
+    model = Model(HiGHS.Optimizer)
+
+    start_time = now()
     @variable(model, flow_from_factories_to_warehouses[k=1:num_commodities,f=1:num_factories_per_commodity,w=1:num_warehouses] >= 0.0);
     @variable(model, flow_from_warehouses_to_stores[k=1:num_commodities,w=1:num_warehouses,s=1:num_stores] >= 0.0);
     @variable(model, warehouse_overtime_amount[j=1:num_warehouses] >= 0.0);
+    println("Create variables: ", now() - start_time)
+    flush(stdout)
 
+    start_time = now()
     @objective(model, Min, 
         sum(shipping_cost_from_factories_to_warehouses[k,f,w] * flow_from_factories_to_warehouses[k,f,w]
             for w=1:num_warehouses for f=1:num_factories_per_commodity for k=1:num_commodities) +
@@ -70,7 +79,10 @@ function build_multicommodity_flow_problem(
             for k=1:num_commodities for w=1:num_warehouses for s=1:num_stores) +
         additional_overtime_cost * sum(warehouse_overtime_amount[w] for w=1:num_warehouses) 
     );
+    println("Set objective: ", now() - start_time)
+    flush(stdout)
 
+    start_time = now()
     # flow from factories does not exceed supply
     for k in 1:num_commodities
         for f in 1:num_factories_per_commodity
@@ -82,7 +94,6 @@ function build_multicommodity_flow_problem(
     # total flow into warehouse
     @expression(model, total_flow_into_warehouses[w in 1:num_warehouses], sum(flow_from_factories_to_warehouses[k,f,w] 
             for k=1:num_commodities for f=1:num_factories_per_commodity));
-
 
     # overtime constraint
     for w in 1:num_warehouses
@@ -110,7 +121,8 @@ function build_multicommodity_flow_problem(
             )
         end
     end
-    println("model built")
+    println("Create constraints: ", now() - start_time)
+    flush(stdout)
 
     if optimize_model
         println("optimizing model ...")
@@ -253,14 +265,13 @@ function main()
     for (arg,val) in parsed_args
         println("  $arg  =>  $val")
     end
-    println("building model ...")
 
     Random.seed!(parsed_args["seed"])
 
     if isdir(parsed_args["folder_for_plots"])
         throw(error("Folder $(parsed_args["folder_for_plots"]) already exists. Please choose a folder location that does not already exist."))
     end
-    model = build_multicommodity_flow_problem(
+    @time "Build model" model = build_multicommodity_flow_problem(
         parsed_args["num_factories_per_commodity"],
         parsed_args["num_commodities"],
         parsed_args["num_warehouses"],
@@ -269,14 +280,19 @@ function main()
         parsed_args["folder_for_plots"],
         parsed_args["optimize_model"]
     )
+    flush(stdout)
 
     if parsed_args["rescale_model"]
         println("rescaling model ...")
-        model = rescale_instance(lp_matrix_data(model))
+	flush(stdout)
+        @time "Rescale model" model = rescale_instance(lp_matrix_data(model))
+	flush(stdout)
     end
 
-    println("writting model to file ...")
-    write_to_file(model, parsed_args["output_file"])
+    println("writing model to file ...")
+    flush(stdout)
+    @time "Write model" write_to_file(model, parsed_args["output_file"])
+    flush(stdout)
 end
 
 main()
