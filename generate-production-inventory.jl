@@ -233,7 +233,7 @@ function main()
     println("writing model to file ...")
     flush(stdout)
     @time "Write model" write_to_file(model, parsed_args["output_file"])
-
+    flush(stdout)
 end
 
 main()
