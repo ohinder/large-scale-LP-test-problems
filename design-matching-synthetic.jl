@@ -82,8 +82,8 @@ function build_synthetic_design_matching_problem(
 
     # First moments are similar to treatment
     expected_first_moment = A' * ones(n) / n
-    @expression(model, first_moment_residual, B' * w / n - expected_first_moment);
-    @constraint(model, -epsilon .<= first_moment_residual .<= epsilon, set_string_name = false);
+    # first_moment_residual = B' * w / n - expected_first_moment.
+    @constraint(model, -epsilon .<= B' * w / n - expected_first_moment .<= epsilon, set_string_name = false);
 
     # Second moments are similar to treatment
     for k = 1:d
@@ -169,9 +169,9 @@ function main()
 
     if parsed_args["rescale_model"]
         println("rescaling model ...")
-	flush(stdout)
+        flush(stdout)
         @time "Rescale model" model = rescale_instance(lp_matrix_data(model))
-	flush(stdout)
+        flush(stdout)
     end
 
     println("writing model to file ...")

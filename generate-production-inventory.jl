@@ -224,9 +224,9 @@ function main()
 
     if parsed_args["rescale_model"]
         println("rescaling model ...")
-	flush(stdout)
+        flush(stdout)
         @time "Rescale model" model = rescale_instance(lp_matrix_data(model))
-	flush(stdout)
+        flush(stdout)
     end
 
     # Write as a mps file
