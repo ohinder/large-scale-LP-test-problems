@@ -11,7 +11,7 @@ using Base
 using HiGHS
 include("utils.jl")
 
-function solve_pde_linear_system(N::Int64, data::JuMP.LPMatrixData, pde_solve_tolerance::Float64, u)
+function solve_pde_linear_system(N::Int64, data::JuMP.LPMatrixData, pde_solve_tolerance::Float64, u::Array{VariableRef, 3})
     start_time = now()
     uvars = data.x_upper
     lvars = data.x_lower
@@ -29,7 +29,7 @@ function solve_pde_linear_system(N::Int64, data::JuMP.LPMatrixData, pde_solve_to
             u_true[p] = lvar
         elseif lvar == -Inf && uvars[i] == Inf
             push!(keep_indicies, i)
-	    push!(keep_points, p)
+            push!(keep_points, p)
         else
             error("Something was wrong with the model")
         end
@@ -50,19 +50,26 @@ function solve_pde_linear_system(N::Int64, data::JuMP.LPMatrixData, pde_solve_to
     end
 
     for i in 1:length(keep_points)
-	u_true[keep_points[i]] = u_tmp[i]
+        u_true[keep_points[i]] = u_tmp[i]
     end
 
     return u_true
 end
 
-function build_discretized_poisson!(model, u, q, N::Int64)
+function build_discretized_poisson!(
+        model::Model, u::Array{VariableRef, 3},
+        q::Union{Array{VariableRef, 3}, Array{Float64, 3}},
+        N::Int64)
     h = 1.0 / N
-    @expression(model, grad_u_xx[i=2:(N+1), j=2:(N+1), k=2:(N+1)], (u[i+1, j, k] - 2 * u[i, j, k] + u[i-1, j, k]) / h^2)
-    @expression(model, grad_u_yy[i=2:(N+1), j=2:(N+1), k=2:(N+1)], (u[i, j+1, k] - 2 * u[i, j, k] + u[i, j-1, k]) / h^2)
-    @expression(model, grad_u_zz[i=2:(N+1), j=2:(N+1), k=2:(N+1)], (u[i, j, k+1] - 2 * u[i, j, k] + u[i, j, k-1]) / h^2)
-    @constraint(model, grad_u_xx + grad_u_yy + grad_u_zz .== -q,
-	        set_string_name = false)
+    @constraint(model, [i=2:(N+1), j=2:(N+1), k=2:(N+1)],
+                # grad_u_xx
+                (u[i+1, j, k] - 2 * u[i, j, k] + u[i-1, j, k]) / h^2 +
+                # grad_u_yy
+                (u[i, j+1, k] - 2 * u[i, j, k] + u[i, j-1, k]) / h^2 +
+                # grad_u_zz
+                (u[i, j, k+1] - 2 * u[i, j, k] + u[i, j, k-1]) / h^2 ==
+                -q[i-1, j-1, k-1],
+                set_string_name = false)
 
     # boundary conditions
     for j = 1:(N+2)
@@ -124,8 +131,10 @@ function build_heat_source_detection_problem(
     start_time = now()
     pde_model = Model()
     @variable(pde_model, u[i=1:(grid_size+2), j=1:(grid_size+2), k=1:(grid_size+2)], set_string_name = false)
-    build_discretized_poisson!(pde_model, u, q, grid_size)
-    u_true = solve_pde_linear_system(grid_size, lp_matrix_data(pde_model), pde_tolerance, u)
+    @time "Build Poisson for u_true" build_discretized_poisson!(pde_model, u, q, grid_size)
+    flush(stdout)
+    @time "Solve u_true" u_true = solve_pde_linear_system(grid_size, lp_matrix_data(pde_model), pde_tolerance, u)
+    flush(stdout)
 
     println("computed u_true: ", now() - start_time)
     flush(stdout)
@@ -160,22 +169,22 @@ function build_heat_source_detection_problem(
         else 
             model = Model()
         end
-	start_time = now()
+        start_time = now()
         @variable(model, u[i=1:(grid_size+2), j=1:(grid_size+2), k=1:(grid_size+2)], set_string_name = false)
         @variable(model, 0.0 <= q[i=1:grid_size, j=1:grid_size, k=1:grid_size] <= 0.0, set_string_name = false)
-	println("Create variables: ", now() - start_time)
-	flush(stdout)
+        println("Create variables: ", now() - start_time)
+        flush(stdout)
 
         start_time = now()
         @objective(model, Min, sum(q))
-	println("Set objective: ", now() - start_time)
-	flush(stdout)
+        println("Set objective: ", now() - start_time)
+        flush(stdout)
 
-	start_time = now()
+        start_time = now()
         # second-order central difference
-        build_discretized_poisson!(model, u, q, grid_size)
-	println("Create discretized poisson constraints: ", now() - start_time)
-	flush(stdout)
+        @time "Build Poisson for main" build_discretized_poisson!(model, u, q, grid_size)
+        println("Create discretized poisson constraints: ", now() - start_time)
+        flush(stdout)
 
         # q is unknown at possible heat source locations
         for location = axes(heat_source_location_indexes, 2)
@@ -204,7 +213,7 @@ function build_heat_source_detection_problem(
             JuMP.set_upper_bound(u[location_indicies...], maximum_u_value)
         end
         println("built inverse problem: ", now() - model_start_time)
-	flush(stdout)
+        flush(stdout)
     end
 
     if optimize_model
@@ -294,9 +303,9 @@ function main()
 
     if parsed_args["rescale_model"]
         println("rescaling model ...")
-	flush(stdout)
+        flush(stdout)
         @time "Rescale model" model = rescale_instance(lp_matrix_data(model))
-	flush(stdout)
+        flush(stdout)
     end
 
     println("writing model to file ...")
