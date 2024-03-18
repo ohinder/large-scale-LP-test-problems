@@ -88,17 +88,18 @@ function build_multicommodity_flow_problem(
         for f in 1:num_factories_per_commodity
             @constraint(model, sum(flow_from_factories_to_warehouses[k,f,w] 
                 for w in 1:num_warehouses) <= supply_per_factory[k],
-		set_string_name = false)
+                set_string_name = false)
         end
     end
 
-    # total flow into warehouse
-    @expression(model, total_flow_into_warehouses[w in 1:num_warehouses], sum(flow_from_factories_to_warehouses[k,f,w] 
-            for k=1:num_commodities for f=1:num_factories_per_commodity));
-
     # overtime constraint
     for w in 1:num_warehouses
-        @constraint(model, total_flow_into_warehouses[w] <= warehouse_normal_capacity + warehouse_overtime_amount[w], set_string_name = false)
+        @constraint(model,
+            sum(flow_from_factories_to_warehouses[k,f,w]
+                for k=1:num_commodities
+                for f=1:num_factories_per_commodity)
+            <= warehouse_normal_capacity + warehouse_overtime_amount[w],
+            set_string_name = false)
     end
 
     # flow into warehouses equals flow out of warehouses
@@ -119,7 +120,7 @@ function build_multicommodity_flow_problem(
             @constraint(model, 
                 sum(flow_from_warehouses_to_stores[k,w,s] for w = 1:num_warehouses) ==
                     demand_per_commodity_store[k,s],
-		set_string_name = false
+                set_string_name = false
             )
         end
     end
@@ -286,9 +287,9 @@ function main()
 
     if parsed_args["rescale_model"]
         println("rescaling model ...")
-	flush(stdout)
+        flush(stdout)
         @time "Rescale model" model = rescale_instance(lp_matrix_data(model))
-	flush(stdout)
+        flush(stdout)
     end
 
     println("writing model to file ...")
