@@ -37,9 +37,9 @@ function rescale_instance(data::JuMP.LPMatrixData)
 
     # build jump model with rescaled data
     rescaled_model = Model()
-    @variable(rescaled_model, x_lower[i] .<= x[i=1:length(x_lower)] .<= x_upper[i])
+    @variable(rescaled_model, x_lower[i] .<= x[i=1:length(x_lower)] .<= x_upper[i], set_string_name=false)
     @objective(rescaled_model, data.sense, sum(c[i] * x[i] for i=1:length(x_lower)))
-    @constraint(rescaled_model, b_lower .<= A * x .<= b_upper)
+    @constraint(rescaled_model, b_lower .<= A * x .<= b_upper, set_string_name=false)
     return rescaled_model
 end
 
