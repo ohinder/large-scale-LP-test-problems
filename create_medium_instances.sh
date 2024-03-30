@@ -8,22 +8,26 @@ julia --project generate-multicommodity-flow.jl \
     --seed 1
 
 julia --project generate-heat-source-location.jl \
-    --output_file medium-problem-instances/heat-source-instance1.mps.gz \
-    --ground_truth_file medium-problem-instances/temperature_ground_truth1.hdf5 \
+    --output_file medium-problem-instances/heat-source-instance-easy.mps.gz \
+    --ground_truth_file medium-problem-instances/temperature_ground_truth-easy.hdf5 \
+    --grid_size 150 \
+    --num_source_locations 5 \
+    --num_possible_source_locations 250 \
+    --num_measurement_locations 500 \
+    --seed 1 \
+    --maximum_relative_measurement_error 0.0 \
+    --pde_solve_tolerance 1e-12
+
+julia --project generate-heat-source-location.jl \
+    --output_file medium-problem-instances/heat-source-instance-hard.mps.gz \
+    --ground_truth_file medium-problem-instances/temperature_ground_truth-hard.hdf5 \
     --grid_size 150 \
     --num_source_locations 5 \
     --num_possible_source_locations 250 \
     --num_measurement_locations 50 \
-    --seed 1
-
-julia --project generate-heat-source-location.jl \
-    --output_file medium-problem-instances/heat-source-instance2.mps.gz \
-    --ground_truth_file medium-problem-instances/temperature_ground_truth2.hdf5 \
-    --grid_size 150 \
-    --num_source_locations 5 \
-    --num_possible_source_locations 250 \
-    --num_measurement_locations 25 \
-    --seed 2
+    --seed 2 \
+    --maximum_relative_measurement_error 0.0 \
+    --pde_solve_tolerance 1e-12
 
 # Note: we calculate epsilon = 1/sqrt(num_treatment_samples) = 0.00316
 julia --project design-matching-synthetic.jl \
