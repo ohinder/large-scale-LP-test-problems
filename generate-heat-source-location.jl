@@ -101,7 +101,8 @@ function build_heat_source_detection_problem(
     grid_size::Int64,
     maximum_relative_measurement_error::Float64,
     optimize_model::Bool,
-    pde_tolerance::Float64
+    pde_tolerance::Float64,
+    set_string_name::Bool
 )
     @assert num_source_locations < num_possible_source_locations
     @assert grid_size > 2
@@ -130,7 +131,7 @@ function build_heat_source_detection_problem(
 
     start_time = now()
     pde_model = Model()
-    @variable(pde_model, u[i=1:(grid_size+2), j=1:(grid_size+2), k=1:(grid_size+2)], set_string_name = false)
+    @variable(pde_model, u[i=1:(grid_size+2), j=1:(grid_size+2), k=1:(grid_size+2)], set_string_name = set_string_name)
     @time "Build Poisson for u_true" build_discretized_poisson!(pde_model, u, q, grid_size)
     flush(stdout)
     @time "Solve u_true" u_true = solve_pde_linear_system(grid_size, lp_matrix_data(pde_model), pde_tolerance, u)
@@ -170,8 +171,8 @@ function build_heat_source_detection_problem(
             model = Model()
         end
         start_time = now()
-        @variable(model, u[i=1:(grid_size+2), j=1:(grid_size+2), k=1:(grid_size+2)], set_string_name = false)
-        @variable(model, 0.0 <= q[i=1:grid_size, j=1:grid_size, k=1:grid_size] <= 0.0, set_string_name = false)
+        @variable(model, u[i=1:(grid_size+2), j=1:(grid_size+2), k=1:(grid_size+2)], set_string_name = set_string_name)
+        @variable(model, 0.0 <= q[i=1:grid_size, j=1:grid_size, k=1:grid_size] <= 0.0, set_string_name = set_string_name)
         println("Create variables: ", now() - start_time)
         flush(stdout)
 
@@ -258,6 +259,12 @@ function parse_commandline()
         "--optimize_model"
         arg_type = Bool
         default = false
+        "--set_string_name"
+        arg_type = Bool
+        default = false
+        help = "This is whether the variables in the model have descriptive names. Turning it on 
+        makes it easier to intepret the model and its solution. On the other hand, turning it off 
+        makes the model quicker to build. Note if you set this to false then you need to also set rescale model to false."
         "--ground_truth_file"
         help = "This is the file that will include the data for the ground truth value of u.
         This is a HDF5 file."
@@ -282,6 +289,8 @@ function main()
         println("  $arg  =>  $val")
     end
 
+    @assert !(parsed_args["set_string_name"] && parsed_args["rescale_model"])
+
     Random.seed!(parsed_args["seed"])
 
     @time "Build model" model, u_true = build_heat_source_detection_problem(
@@ -291,7 +300,8 @@ function main()
         parsed_args["grid_size"],
         parsed_args["maximum_relative_measurement_error"],
         parsed_args["optimize_model"],
-        parsed_args["pde_solve_tolerance"]
+        parsed_args["pde_solve_tolerance"],
+        parsed_args["set_string_name"]
     )
     flush(stdout)
 
@@ -310,7 +320,7 @@ function main()
 
     println("writing model to file ...")
     flush(stdout)
-    @time "Write model" write_to_file(model, parsed_args["output_file"], generic_names = true)
+    @time "Write model" write_to_file(model, parsed_args["output_file"], generic_names = !parsed_args["set_string_name"])
     flush(stdout)
 end
 
