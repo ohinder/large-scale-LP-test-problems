@@ -168,7 +168,7 @@ function build_heat_source_detection_problem(
         if optimize_model
             model = direct_model(HiGHS.Optimizer())
         else 
-            model = direct_model(MOI.FileFormats.MPS.Model{Float64}())
+            model = direct_model(MOI.FileFormats.MPS.Model(generic_names = !set_string_name))
         end
         start_time = now()
         @variable(model, u[i=1:(grid_size+2), j=1:(grid_size+2), k=1:(grid_size+2)], set_string_name = set_string_name)
@@ -333,7 +333,7 @@ function main()
 
     println("writing model to file ...")
     flush(stdout)
-    @time "Write model" write_to_file(model, parsed_args["output_file"], generic_names = !parsed_args["set_string_name"])
+    @time "Write model" MOI.write_to_file(backend(model), parsed_args["output_file"])
     flush(stdout)
 end
 
