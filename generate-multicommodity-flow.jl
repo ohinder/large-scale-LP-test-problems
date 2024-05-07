@@ -62,7 +62,11 @@ function build_multicommodity_flow_problem(
     println("Generate instance data: ", now() - start_time)
     flush(stdout)
 
-    model = Model(HiGHS.Optimizer)
+    if optimize_model
+        model = direct_model(HiGHS.Optimizer())
+    else
+        model = direct_model(MOI.FileFormats.MPS.Model(generic_names = true))
+    end
 
     start_time = now()
     @variable(model, flow_from_factories_to_warehouses[k=1:num_commodities,f=1:num_factories_per_commodity,w=1:num_warehouses] >= 0.0, set_string_name = false);
@@ -294,7 +298,7 @@ function main()
 
     println("writing model to file ...")
     flush(stdout)
-    @time "Write model" write_to_file(model, parsed_args["output_file"], generic_names = true)
+    @time "Write model" MOI.write_to_file(backend(model), parsed_args["output_file"])
     flush(stdout)
 end
 
