@@ -236,7 +236,7 @@ function main()
     # Write as a mps file
     println("writing model to file ...")
     flush(stdout)
-    @time "Write model" MOI.write_to_file(backend(model), parsed_args["output_file"])
+    @time "Write model" MOI.write_to_file(JuMP.backend(model), parsed_args["output_file"])
     flush(stdout)
 
 end
