@@ -166,9 +166,9 @@ function build_heat_source_detection_problem(
     begin
         model_start_time = now()
         if optimize_model
-            model = Model(HiGHS.Optimizer)
+            model = direct_model(HiGHS.Optimizer())
         else 
-            model = Model()
+            model = direct_model(MOI.FileFormats.MPS.Model(generic_names = !set_string_name))
         end
         start_time = now()
         @variable(model, u[i=1:(grid_size+2), j=1:(grid_size+2), k=1:(grid_size+2)], set_string_name = set_string_name)
@@ -293,13 +293,26 @@ function main()
 
     Random.seed!(parsed_args["seed"])
 
+    if parsed_args["optimize_model"]
+        @time "Build model" model, u_true = build_heat_source_detection_problem(
+            parsed_args["num_source_locations"],
+            parsed_args["num_possible_source_locations"],
+            parsed_args["num_measurement_locations"],
+            parsed_args["grid_size"],
+            parsed_args["maximum_relative_measurement_error"],
+            true,
+            parsed_args["pde_solve_tolerance"],
+            parsed_args["set_string_name"]
+        ) 
+    end
+
     @time "Build model" model, u_true = build_heat_source_detection_problem(
         parsed_args["num_source_locations"],
         parsed_args["num_possible_source_locations"],
         parsed_args["num_measurement_locations"],
         parsed_args["grid_size"],
         parsed_args["maximum_relative_measurement_error"],
-        parsed_args["optimize_model"],
+        false,
         parsed_args["pde_solve_tolerance"],
         parsed_args["set_string_name"]
     )
@@ -320,7 +333,7 @@ function main()
 
     println("writing model to file ...")
     flush(stdout)
-    @time "Write model" write_to_file(model, parsed_args["output_file"], generic_names = !parsed_args["set_string_name"])
+    @time "Write model" MOI.write_to_file(backend(model), parsed_args["output_file"])
     flush(stdout)
 end
 
