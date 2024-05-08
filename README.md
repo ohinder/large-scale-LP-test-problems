@@ -206,6 +206,12 @@ We then generate our grid and round the positional vectors to the nearest point 
 This yields a set $M$ of indices for the measurement locations.
 Finally, we solve the discretized Possion's equation to calculate the true temperature distribution $u^\star$.
 
+### Validation of recovery
+
+One can also validate recovery of the true solution by using the script `validate-heat-source-solution.jl`.
+This script compares the temperature profile $u$ of the true solution (computed during instance generation)
+with the solution obtained by PDLP from solving the optimization problem.
+
 ## Statistical matching with covariate balancing constraints for making causal inference on observational data
 
 ### Motivation
