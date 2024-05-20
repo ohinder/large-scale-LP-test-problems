@@ -34,7 +34,8 @@ function build_multicommodity_flow_problem(
 
     total_demand_per_commodity = demand_per_commodity_store * ones(num_stores);
 
-    supply_per_factory = num_stores * total_demand_per_commodity / num_factories_per_commodity;
+    tolerance = 1e-8 # to stop possibility of numerical errors
+    supply_per_factory = (1.0 + tolerance) * total_demand_per_commodity / num_factories_per_commodity;
     total_demand = sum(demand_per_commodity_store);
 
     warehouse_normal_capacity =  0.95 * total_demand / num_warehouses;
@@ -278,6 +279,11 @@ function main()
     if isdir(parsed_args["folder_for_plots"])
         throw(error("Folder $(parsed_args["folder_for_plots"]) already exists. Please choose a folder location that does not already exist."))
     end
+
+    if parsed_args["folder_for_plots"] != "" && parsed_args["optimize_model"] == false
+        throw(error("If folder_for_plots is nonempty then optimize_model flag should be set"))
+    end
+
     @time "Build model" model = build_multicommodity_flow_problem(
         parsed_args["num_factories_per_commodity"],
         parsed_args["num_commodities"],
