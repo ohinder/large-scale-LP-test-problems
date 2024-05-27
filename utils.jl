@@ -36,7 +36,7 @@ function rescale_instance(data::JuMP.LPMatrixData)
     A = (Diagonal(rescaling_rhs) * data.A) * Diagonal(rescaling_obj)
 
     # build jump model with rescaled data
-    rescaled_model = Model()
+    rescaled_model = direct_model(MOI.FileFormats.MPS.Model(generic_names = true))
     @variable(rescaled_model, x_lower[i] .<= x[i=1:length(x_lower)] .<= x_upper[i], set_string_name=false)
     @objective(rescaled_model, data.sense, sum(c[i] * x[i] for i=1:length(x_lower)))
     @constraint(rescaled_model, b_lower .<= A * x .<= b_upper, set_string_name=false)

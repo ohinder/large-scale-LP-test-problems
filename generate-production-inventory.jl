@@ -84,7 +84,11 @@ function CreateProblemInstance(E,T,Dmin,Dmax,α,p,Q,Vmin,Vmax,v1,optimize_model)
     # Set up optimization problem
     ###########################################################################
 
-    model = JuMP.Model(HiGHS.Optimizer)
+    if optimize_model
+        model = direct_model(HiGHS.Optimizer())
+    else
+	model = direct_model(MOI.FileFormats.MPS.Model(generic_names = true))
+    end
 
     start_time = now()
     # Decision variables for linear decision rule
@@ -232,7 +236,7 @@ function main()
     # Write as a mps file
     println("writing model to file ...")
     flush(stdout)
-    @time "Write model" write_to_file(model, parsed_args["output_file"], generic_names = true)
+    @time "Write model" MOI.write_to_file(JuMP.backend(model), parsed_args["output_file"])
     flush(stdout)
 
 end

@@ -55,7 +55,11 @@ function build_synthetic_design_matching_problem(
     println("Generate instance data: ", now() - start_time)
     flush(stdout)
     
-    model = Model(HiGHS.Optimizer)
+    if optimize_model
+        model = direct_model(HiGHS.Optimizer())
+    else
+        model = direct_model(MOI.FileFormats.MPS.Model(generic_names = true))
+    end
     start_time = now()
     @variable(model, 0 <= x[col=1:length(edges)] <= 1.0, set_string_name = false);
     @variable(model, 0 <= w[j=1:m] <= 1.0, set_string_name = false);
@@ -176,7 +180,7 @@ function main()
 
     println("writing model to file ...")
     flush(stdout)
-    @time "Write model" write_to_file(model, parsed_args["output_file"], generic_names = true)
+    @time "Write model" MOI.write_to_file(JuMP.backend(model), parsed_args["output_file"])
     flush(stdout)
 end
 
