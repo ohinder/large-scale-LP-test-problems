@@ -11,9 +11,9 @@ julia --project generate-heat-source-location.jl \
     --output_file large-problem-instances/heat-source-instance-easy.mps.gz \
     --ground_truth_file large-problem-instances/temperature_ground_truth-easy.hdf5 \
     --grid_size 300 \
-    --num_source_locations 10 \
-    --num_possible_source_locations 500 \
-    --num_measurement_locations 2000 \
+    --num_source_locations 7 \
+    --num_possible_source_locations 400 \
+    --num_measurement_locations 800 \
     --seed 1 \
     --maximum_relative_measurement_error 0.0 \
     --pde_solve_tolerance 1e-12
