@@ -64,7 +64,7 @@ function build_multicommodity_flow_problem(
     flush(stdout)
 
     if optimize_model
-        model = direct_model(HiGHS.Optimizer())
+        model = direct_model(optimizer_with_attributes(HiGHS.Optimizer, "small_matrix_value"=>1e-12))
     else
         model = direct_model(MOI.FileFormats.MPS.Model(generic_names = true))
     end
