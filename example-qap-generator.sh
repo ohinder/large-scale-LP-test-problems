@@ -1,4 +1,4 @@
-gfortran -O3 -o qap-gen newlp-56.f # this build the https://netlib.sandia.gov/lp/generators/qap/newlp.f file modified so 56 is the maximum input size
+gfortran -O3 -mcmodel=large -o qap-gen newlp-300.f # this build the https://netlib.sandia.gov/lp/generators/qap/newlp.f file modified so 300 is the maximum input size
 
 instance_name="tai50a"
 file_in_tj_format="QAP-TJ-format/${instance_name}.txt"
