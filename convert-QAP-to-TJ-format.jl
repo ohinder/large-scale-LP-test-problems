@@ -31,6 +31,7 @@ function read_QAP_library_problem(filename::String)
         # Read matrix A
         A_vec = Int[] 
         while length(A_vec) < n^2 
+	    @assert !eof(file)
             append!(A_vec, parse.(Int, split(readline(file))))
         end 
         A = reshape(A_vec, (n,n))
@@ -38,6 +39,7 @@ function read_QAP_library_problem(filename::String)
         # Read matrix B
         B_vec = Int[] 
         while length(B_vec) < n^2 
+	    @assert !eof(file)
             append!(B_vec, parse.(Int, split(readline(file))))
         end 
         B = reshape(B_vec, (n,n))
