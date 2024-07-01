@@ -26,9 +26,6 @@ function read_QAP_library_problem(filename::String)
         # Read the number n
         n = parse(Int, readline(file))
         
-        # Skip the empty line after n
-        readline(file)
-                
         B = zeros(Int, n, n) # distance matrix
         
         # Read matrix A
@@ -38,9 +35,6 @@ function read_QAP_library_problem(filename::String)
         end 
         A = reshape(A_vec, (n,n))
 
-        # Skip the empty line after matrix A
-        readline(file)
-        
         # Read matrix B
         B_vec = Int[] 
         while length(B_vec) < n^2 
