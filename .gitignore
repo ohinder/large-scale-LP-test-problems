@@ -3,3 +3,8 @@ small-problem-instances/*
 large-problem-instances/*
 .vscode
 .direnv
+/tiny-problem-instances
+/qapdata
+/QAPLIB
+qap-gen
+/QAP-TJ-format
