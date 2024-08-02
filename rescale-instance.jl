@@ -26,10 +26,18 @@ function main()
         println("  $arg  =>  $val")
     end
 
+    println("read model ...")
+    flush(stdout)
     original_model = read_from_file(parsed_args["input_file"])
-    relaxed_model = relax_integrality(original_model)
 
-    rescaled_model = rescale_instance(lp_matrix_data(relaxed_model))
+    println("relax model ...")
+    flush(stdout)
+    relax_integrality(original_model)
+
+    println("rescale model ...")
+    flush(stdout)
+    rescaled_model = rescale_instance(lp_matrix_data(original_model))
+    
     println("writing model to file ...")
     flush(stdout)
     @time "Write model" MOI.write_to_file(JuMP.backend(rescaled_model), parsed_args["output_file"])
