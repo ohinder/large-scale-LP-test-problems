@@ -85,7 +85,7 @@ Let $d_{k,s}$ be the demand for store $s$ for commodity $k$.
 The values for $d_{k,s}$ are generated in a two step process.
 If the first step we generate average demands for each 
 commodity
-$a_{k} = 100 \exp(Z_k)$ where $Z_1, \dots, Z_K$ are sampled indepedently from a standard normal distributation.
+$a_{k} = 100 \exp(Z_k)$ where $Z_1, \dots, Z_K$ are sampled indepedently from a standard normal distribution.
 Then, demands at each store $s$ for commodity $k$ are realized by setting
 $d_{k,s} \sim \text{Possion}(a_k)$.
 This two step process generates more realistic data as some products have very high demand while most products have very low demand.
