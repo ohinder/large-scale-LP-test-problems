@@ -1,6 +1,6 @@
 ## Repository of instances used for paper 
 
-This repository allows one to create a subset of the instances for the paper from scratch. However, it is much easier to just use the created (and scaled) instances that can be found at [here](https://drive.google.com/drive/folders/1yXi33qzzsn5OSJ7iJtm2kpcOHjtxLmTR).
+This repository allows one to create a subset of the instances for the paper from scratch. However, it is much easier to just use the created (and scaled) instances that can be found at [here](https://www.oliverhinder.com/huge-linear-programs).
 
 ## Instruction for running Gurobi
 
