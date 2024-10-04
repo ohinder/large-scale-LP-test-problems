@@ -11,6 +11,7 @@ $ gurobi_cl Crossover=0 Method=[method] [mps_file_name]
 ```
 
 where method=0 for primal Simplex, 1 for dual and 2 for barrier.
+We used Gurobi 11.0.1 (https://www.gurobi.com/downloads/).
 
 Documentation for this method can be found at https://www.gurobi.com/documentation/current/refman/grb_command_line_tool.html
 
