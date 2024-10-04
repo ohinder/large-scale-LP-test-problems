@@ -26,7 +26,14 @@ $ cmake -S. -Bbuild -DUSE_COINOR=OFF -DUSE_SCIP=OFF -DBUILD_DEPS:BOOL=O -DCMAKE_
 cmake --build build
 ```
 
-Navigate to the directory that you want to run PDLP from,
+Note that PDLP accepts .mps files but not .mps.gz files. Thus
+before using PDLP you need to ungzip the mps files. For example, you can do that via
+
+```{sh}
+$ gunzip "xxx.mps.gz"
+```
+
+Next, navigate to the directory that you want to run PDLP from,
 then run the command:
 
 ```{sh}
