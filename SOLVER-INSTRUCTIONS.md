@@ -42,7 +42,9 @@ $ [path to or-tools]/build/bin/pdlp_solve --input [mps filename] --sol_file [sol
 --params "verbosity_level: 4 num_threads: [number of threads] termination_criteria {detailed_optimality_criteria {eps_optimal_primal_residual_absolute: 1.0e-8 eps_optimal_primal_residual_relative: 0.0 eps_optimal_dual_residual_absolute: 1.0e-8 eps_optimal_dual_residual_relative: 0.0 eps_optimal_objective_gap_absolute: 0.0 eps_optimal_objective_gap_relative: 1.0e-2} eps_primal_infeasible: 1.0e-9 eps_dual_infeasible: 1.0e-9 optimality_norm: OPTIMALITY_NORM_L_INF} use_feasibility_polishing: [true/false] handle_some_primal_gradients_on_finite_bounds_as_residuals: false"
 ```
 
-This produces the results table. The speed up against threads figure can be reproduced by running
+This produces the results table. The values for the number of threads
+is either 16 or 32 depending on the instance as described in the paper.
+The speed up against the number of threads figure can be reproduced by running
 
 ```{sh}
 $ [path to or-tools]/build/bin/pdlp_solve --input [mps filename] --sol_file [solution filename] -- solve_log_file [log file name] \
