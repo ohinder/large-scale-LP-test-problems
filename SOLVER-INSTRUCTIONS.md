@@ -16,7 +16,7 @@ Download the **source files** for OR-Tools from the bottom the page of https://d
 $ path_to_OR_tools=[path to or-tools]
 ```
 
-Build it from source, for example, run the following command from inside the or-tools directory.
+Next, build it from source, for example, run the following command from inside the or-tools directory.
 
 ```{sh}
 $ cd $path_to_OR_tools
@@ -37,13 +37,13 @@ We will now detail how to reproduce the design-match row of Table 3. The other r
 To produce the 'without polishing' column:
 
 ```{sh}
-$ PathToSolutionFiles=[directory for solution files]
+$ path_to_solution_files=[directory for solution files]
 $ path_to_log_files=[directory for log files]
 $ instance_name="design-match"
 $ "$path_to_OR_tools"/build/bin/pdlp_solve \
 --input "$path_to_instances"/"$instance_name".mps \
 --sol_file "$path_to_log_files"/no-polish-"$instance_name".pb \
---solve_log_file "$path_to_log_files"/no-polish-"$instance_name".log \
+--solve_log_file "$path_to_solution_files"/no-polish-"$instance_name".log \
 --params "verbosity_level: 4 num_threads: 16 termination_criteria {detailed_optimality_criteria {eps_optimal_primal_residual_absolute: 1.0e-8 eps_optimal_primal_residual_relative: 0.0 eps_optimal_dual_residual_absolute: 1.0e-8 eps_optimal_dual_residual_relative: 0.0 eps_optimal_objective_gap_absolute: 0.0 eps_optimal_objective_gap_relative: 1.0e-2} eps_primal_infeasible: 1.0e-9 eps_dual_infeasible: 1.0e-9 optimality_norm: OPTIMALITY_NORM_L_INF} use_feasibility_polishing: false handle_some_primal_gradients_on_finite_bounds_as_residuals: false"
 ```
 
@@ -53,7 +53,7 @@ To produce the 'with polishing' column
 $ "$path_to_OR_tools"/build/bin/pdlp_solve \
 --input "$path_to_instances"/"$instance_name".mps \
 --sol_file "$path_to_log_files"/polish-"$instance_name".pb \
---solve_log_file "$path_to_log_files"/polish-"$instance_name".log \
+--solve_log_file "$path_to_solution_files"/polish-"$instance_name".log \
 --params "verbosity_level: 4 num_threads: 16 termination_criteria {detailed_optimality_criteria {eps_optimal_primal_residual_absolute: 1.0e-8 eps_optimal_primal_residual_relative: 0.0 eps_optimal_dual_residual_absolute: 1.0e-8 eps_optimal_dual_residual_relative: 0.0 eps_optimal_objective_gap_absolute: 0.0 eps_optimal_objective_gap_relative: 1.0e-2} eps_primal_infeasible: 1.0e-9 eps_dual_infeasible: 1.0e-9 optimality_norm: OPTIMALITY_NORM_L_INF} use_feasibility_polishing: true handle_some_primal_gradients_on_finite_bounds_as_residuals: false"
 ```
 
