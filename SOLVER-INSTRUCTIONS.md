@@ -43,7 +43,7 @@ $ instance_name="design-match"
 $ "$path_to_OR_tools"/build/bin/pdlp_solve \
 --input "$path_to_instances"/"$instance_name".mps \
 --sol_file "$path_to_log_files"/no-polish-"$instance_name".pb \
---solve_log_file "$path_to_solution_files"/no-polish-"$instance_name".log \
+--solve_log_file "$path_to_solution_files"/no-polish-"$instance_name".pb \
 --params "verbosity_level: 4 num_threads: 16 termination_criteria {detailed_optimality_criteria {eps_optimal_primal_residual_absolute: 1.0e-8 eps_optimal_primal_residual_relative: 0.0 eps_optimal_dual_residual_absolute: 1.0e-8 eps_optimal_dual_residual_relative: 0.0 eps_optimal_objective_gap_absolute: 0.0 eps_optimal_objective_gap_relative: 1.0e-2} eps_primal_infeasible: 1.0e-9 eps_dual_infeasible: 1.0e-9 optimality_norm: OPTIMALITY_NORM_L_INF} use_feasibility_polishing: false handle_some_primal_gradients_on_finite_bounds_as_residuals: false"
 ```
 
@@ -53,7 +53,7 @@ To produce the 'with polishing' column
 $ "$path_to_OR_tools"/build/bin/pdlp_solve \
 --input "$path_to_instances"/"$instance_name".mps \
 --sol_file "$path_to_log_files"/polish-"$instance_name".pb \
---solve_log_file "$path_to_solution_files"/polish-"$instance_name".log \
+--solve_log_file "$path_to_solution_files"/polish-"$instance_name".pb \
 --params "verbosity_level: 4 num_threads: 16 termination_criteria {detailed_optimality_criteria {eps_optimal_primal_residual_absolute: 1.0e-8 eps_optimal_primal_residual_relative: 0.0 eps_optimal_dual_residual_absolute: 1.0e-8 eps_optimal_dual_residual_relative: 0.0 eps_optimal_objective_gap_absolute: 0.0 eps_optimal_objective_gap_relative: 1.0e-2} eps_primal_infeasible: 1.0e-9 eps_dual_infeasible: 1.0e-9 optimality_norm: OPTIMALITY_NORM_L_INF} use_feasibility_polishing: true handle_some_primal_gradients_on_finite_bounds_as_residuals: false"
 ```
 
@@ -61,21 +61,21 @@ To produce the 'Gurobi barrier' column:
 
 ```{sh}
 gurobi_cl Crossover=0 Method=2 "$path_to_instances"/"$instance_name".mps.gz  \
-LogFile=$path_to_log_files/barrier-"$instance_name".log
+LogFile=$path_to_log_files/barrier-"$instance_name".pb
 ```
 
 To produce the 'Gurobi primal simplex' column:
 
 ```{sh}
 gurobi_cl Crossover=0 Method=0 "$path_to_instances"/"$instance_name".mps.gz \
-LogFile=$path_to_log_files/primal-"$instance_name".log
+LogFile=$path_to_log_files/primal-"$instance_name".pb
 ```
 
 To produce the 'Gurobi dual simplex' column:
 
 ```{sh}
 gurobi_cl Crossover=0 Method=1 "$path_to_instances"/"$instance_name".mps.gz \
-LogFile=$path_to_log_files/dual-"$instance_name".log
+LogFile=$path_to_log_files/dual-"$instance_name".pb
 ```
 
 Documentation for gurobi_cl can be found in the [Gurobi command line documentation](https://www.gurobi.com/documentation/current/refman/grb_command_line_tool.html)
@@ -93,7 +93,7 @@ $ num_threads="4"
 $ "$path_to_OR_tools"/build/bin/pdlp_solve \
 --input "$path_to_instances"/"$instance_name".mps \
 --sol_file "$path_to_log_files"/thread-test-"$instance_name".pb \
---solve_log_file "$path_to_log_files"/thread-test-"$instance_name".log \
+--solve_log_file "$path_to_log_files"/thread-test-"$instance_name".pb \
 --params "verbosity_level: 4 num_threads: $num_threads termination_criteria {detailed_optimality_criteria {eps_optimal_primal_residual_absolute: 1.0e-8 eps_optimal_primal_residual_relative: 0.0 eps_optimal_dual_residual_absolute: 1.0e-8 eps_optimal_dual_residual_relative: 0.0 eps_optimal_objective_gap_absolute: 0.0 eps_optimal_objective_gap_relative: 1.0e-2} eps_primal_infeasible: 1.0e-9 eps_dual_infeasible: 1.0e-9 optimality_norm: OPTIMALITY_NORM_L_INF iteration_limit: 10000} use_feasibility_polishing: false handle_some_primal_gradients_on_finite_bounds_as_residuals: false"
 ```
 
