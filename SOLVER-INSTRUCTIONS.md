@@ -3,7 +3,7 @@
 This repository allows one to generate from scratch a subset of the instances for the paper.
 See README.md in this repository for instructions on how to generate the instances.
 
-To save time, we recommend downloading the already generated (and scaled) instances from [here](https://www.oliverhinder.com/huge-linear-programs).
+To save time, we recommend downloading the already generated (and scaled) instances from [here](https://www.oliverhinder.com/large-scale-LP-problems).
 Download these files to a directory and save this directory path in your linux terminal as a local variable, which will be referenced in example commands below.
 
 ```sh
