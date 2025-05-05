@@ -3,7 +3,7 @@ Repository for generating large-scale linear programming (LP) test instances for
 # One-time setup
 The code was tested using Julia 1.10.0. To instantiate all the required packages execute 
 ``` shell
-julia --project=. -e "import Pkg; Pkg.instantiate()"
+$ julia --project=. -e "import Pkg; Pkg.instantiate()"
 ```
 
 # Creating the test instances
